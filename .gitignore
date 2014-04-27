@@ -172,3 +172,8 @@ UpgradeLog*.htm
 
 # Microsoft Fakes
 FakesAssemblies/
+
+TgcViewer.exe
+
+AlumnoEjemplos.dll
+Ionic.Zip.dll
