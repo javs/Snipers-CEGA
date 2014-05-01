@@ -7,6 +7,8 @@ using Microsoft.DirectX.Direct3D;
 using System.Drawing;
 using Microsoft.DirectX;
 using TgcViewer.Utils.Modifiers;
+using TgcViewer.Utils.TgcSceneLoader;
+using TgcViewer.Utils.TgcGeometry;
 
 namespace AlumnoEjemplos.CEGA
 {
@@ -45,6 +47,16 @@ namespace AlumnoEjemplos.CEGA
         /// Escribir aquí todo el código de inicialización: cargar modelos, texturas, modifiers, uservars, etc.
         /// Borrar todo lo que no haga falta
         /// </summary>
+        /// 
+
+        TgcBox suelo;
+        List<TgcMesh> meshes;
+        TgcMesh pinoOriginal;
+        TgcMesh sniperRifleMesh;
+
+        Vector3 lookAtAnterior;
+
+
         public override void init()
         {
             //GuiController.Instance: acceso principal a todas las herramientas del Framework
@@ -55,73 +67,70 @@ namespace AlumnoEjemplos.CEGA
             //Carpeta de archivos Media del alumno
             string alumnoMediaFolder = GuiController.Instance.AlumnoEjemplosMediaDir;
 
+            //////ESCENARIO///////
+
+            TgcTexture pisoTexture = TgcTexture.createTexture(d3dDevice, alumnoMediaFolder + "Textures\\Grass.jpg");
+            suelo = TgcBox.fromSize(new Vector3(1100, 0, 1100), new Vector3(2600, 0, 2600), pisoTexture);
+
+            TgcSceneLoader loader = new TgcSceneLoader();
+            TgcScene scene = loader.loadSceneFromFile(alumnoMediaFolder + "\\Pino-TgcScene.xml");
+
+            pinoOriginal = scene.Meshes[0];
+
+            //Crear varias instancias del modelo original, pero sin volver a cargar el modelo entero cada vez, hago 23*23 = 529 pinos
+            int rows = 23;
+            int cols = 23;
+            float offset = 100;
+            meshes = new List<TgcMesh>();
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < cols; j++)
+                {
+                    //Crear instancia de modelo
+                    TgcMesh instance = pinoOriginal.createMeshInstance(pinoOriginal.Name + i + "_" + j);
+
+                    //Desplazarlo
+                    instance.move(i * offset, 0, j * offset);
+                    instance.AlphaBlendEnable = true;
+                    instance.Scale = new Vector3(0.25f, 0.25f, 0.25f);
+
+                    meshes.Add(instance);
+                }
+            }
+
+
+            ////////SNIPER////////
+
+            //Sniper
+
+            TgcSceneLoader loaderSniper = new TgcSceneLoader();
+            TgcScene sniperRifle = loaderSniper.loadSceneFromFile(alumnoMediaFolder + "\\Sniper-TgcScene.xml"); //Este modelo no carga bien, ya le pregunte al tutor para ver cual puede ser el problema
+
+            //De toda la escena solo nos interesa guardarnos el primer modelo (el único que hay en este caso).
+            sniperRifleMesh = sniperRifle.Meshes[0];
+            sniperRifleMesh.Position = new Vector3(125, 5, 125);
+            sniperRifleMesh.AlphaBlendEnable = true;
+            sniperRifleMesh.Scale = new Vector3(0.01F, 0.01F, 0.01F);
+
+
+
+
 
             ///////////////USER VARS//////////////////
-
-            //Crear una UserVar
-            GuiController.Instance.UserVars.addVar("variablePrueba");
-
-            //Cargar valor en UserVar
-            GuiController.Instance.UserVars.setValue("variablePrueba", 5451);
-
 
 
             ///////////////MODIFIERS//////////////////
 
-            //Crear un modifier para un valor FLOAT
-            GuiController.Instance.Modifiers.addFloat("valorFloat", -50f, 200f, 0f);
-
-            //Crear un modifier para un ComboBox con opciones
-            string[] opciones = new string[]{"opcion1", "opcion2", "opcion3"};
-            GuiController.Instance.Modifiers.addInterval("valorIntervalo", opciones, 0);
-
-            //Crear un modifier para modificar un vértice
-            GuiController.Instance.Modifiers.addVertex3f("valorVertice", new Vector3(-100, -100, -100), new Vector3(50, 50, 50), new Vector3(0, 0, 0));
-
-
-
-            ///////////////CONFIGURAR CAMARA ROTACIONAL//////////////////
-            //Es la camara que viene por default, asi que no hace falta hacerlo siempre
-            GuiController.Instance.RotCamera.Enable = true;
-            //Configurar centro al que se mira y distancia desde la que se mira
-            GuiController.Instance.RotCamera.setCamera(new Vector3(0, 0, 0), 100);
-
-
-            /*
+            
             ///////////////CONFIGURAR CAMARA PRIMERA PERSONA//////////////////
             //Camara en primera persona, tipo videojuego FPS
             //Solo puede haber una camara habilitada a la vez. Al habilitar la camara FPS se deshabilita la camara rotacional
             //Por default la camara FPS viene desactivada
             GuiController.Instance.FpsCamera.Enable = true;
             //Configurar posicion y hacia donde se mira
-            GuiController.Instance.FpsCamera.setCamera(new Vector3(0, 0, -20), new Vector3(0, 0, 0));
-            */
-
-
-
-            ///////////////LISTAS EN C#//////////////////
-            //crear
-            List<string> lista = new List<string>();
-
-            //agregar elementos
-            lista.Add("elemento1");
-            lista.Add("elemento2");
-
-            //obtener elementos
-            string elemento1 = lista[0];
-
-            //bucle foreach
-            foreach (string elemento in lista)
-            {
-                //Loggear por consola del Framework
-                GuiController.Instance.Logger.log(elemento);
-            }
-
-            //bucle for
-            for (int i = 0; i < lista.Count; i++)
-            {
-                string element = lista[i];
-            }
+            GuiController.Instance.FpsCamera.setCamera(sniperRifleMesh.Position, new Vector3(0, 0, 0));
+            //Velocidad
+            GuiController.Instance.FpsCamera.Velocity = new Vector3(10, 10, 10);
 
 
         }
@@ -133,24 +142,27 @@ namespace AlumnoEjemplos.CEGA
         /// Borrar todo lo que no haga falta
         /// </summary>
         /// <param name="elapsedTime">Tiempo en segundos transcurridos desde el último frame</param>
+        /// 
+
         public override void render(float elapsedTime)
         {
             //Device de DirectX para renderizar
             Device d3dDevice = GuiController.Instance.D3dDevice;
 
+            //Muevo el sniper con la camara
+            sniperRifleMesh.Position = GuiController.Instance.FpsCamera.Position - new Vector3(0.5F,1,1.5F);
 
-            //Obtener valor de UserVar (hay que castear)
-            int valor = (int)GuiController.Instance.UserVars.getValue("variablePrueba");
+            //Roto el sniper segun donde mira la camara ESTO NO FUNCIONA BIEN 
+            /* Calculo el angulo entre la posicion anterior y la posicion actual, y roto el mesh segun ese angulo
+             * Luego actualizo la posicion anterior
+             
+            float angle = FastMath.Acos(Vector3.Dot(Vector3.Normalize(lookAtAnterior), Vector3.Normalize(GuiController.Instance.FpsCamera.LookAt - GuiController.Instance.FpsCamera.Position)));
 
+            sniperRifleMesh.rotateY(angle);
 
-            //Obtener valores de Modifiers
-            float valorFloat = (float)GuiController.Instance.Modifiers["valorFloat"];
-            string opcionElegida = (string)GuiController.Instance.Modifiers["valorIntervalo"];
-            Vector3 valorVertice = (Vector3)GuiController.Instance.Modifiers["valorVertice"];
+            lookAtAnterior = GuiController.Instance.FpsCamera.LookAt - GuiController.Instance.FpsCamera.Position;*/
 
-
-            ///////////////INPUT//////////////////
-            //conviene deshabilitar ambas camaras para que no haya interferencia
+           ///////////////INPUT//////////////////
 
             //Capturar Input teclado 
             if (GuiController.Instance.D3dInput.keyPressed(Microsoft.DirectX.DirectInput.Key.F))
@@ -164,7 +176,23 @@ namespace AlumnoEjemplos.CEGA
                 //Boton izq apretado
             }
 
+
+            /////////RENDERS/////////
+
+            //Renderizar suelo
+            suelo.render();
+
+            //Renderizo el Sniper
+            sniperRifleMesh.render();
+            //Renderizar instancias
+            foreach (TgcMesh mesh in meshes)
+            {
+                mesh.render();
+            }
+
         }
+
+
 
         /// <summary>
         /// Método que se llama cuando termina la ejecución del ejemplo.
