@@ -17,6 +17,8 @@ namespace AlumnoEjemplos.CEGA
     class Player : IRenderObject, IUpdatable
     {
         TgcMesh rifle;
+        Vector3 lookAtInicialDelRifle;
+        Vector3 posicionAnterior;
 
         public Player()
         {
@@ -42,24 +44,43 @@ namespace AlumnoEjemplos.CEGA
             camera.Enable = true;
             //Configurar posicion y hacia donde se mira
             camera.setCamera(rifle.Position, new Vector3(0.0f, 0.0f, 0.0f));
-            camera.MovementSpeed = 50.0f;
+            camera.MovementSpeed = 20.0f;
+
+            // hacia donde mira el rifle, sin transformaciones
+            lookAtInicialDelRifle = new Vector3(0.0f, 0.0f, -1.0f);
+            lookAtInicialDelRifle.Normalize();
+
+            rifle.AutoTransformEnable = false;
         }
 
         public void update(float elapsedTime)
         {
-            // Muevo el rifle con la camara
-            rifle.Position = GuiController.Instance.FpsCamera.Position - new Vector3(0.5f, 1.0f, 2.0f);
-            
-            //Roto el sniper segun donde mira la camara ESTO NO FUNCIONA BIEN 
-            /* Calculo el angulo entre la posicion anterior y la posicion actual, y roto el mesh segun ese angulo
-             * Luego actualizo la posicion anterior
-             */
-             
-            //float angle = FastMath.Acos(Vector3.Dot(Vector3.Normalize(lookAtAnterior), Vector3.Normalize(GuiController.Instance.FpsCamera.LookAt - GuiController.Instance.FpsCamera.Position)));
+            // FpsCamera traslada el vector a la posicion de la camara. Eso complica los calculos, asique aca se substrae.
+            Vector3 lookAt = GuiController.Instance.FpsCamera.LookAt - GuiController.Instance.FpsCamera.Position;
 
-            //rifle.rotateY(angle);
+            lookAt.Y = 0; // la posicion vertical interfiere con el calculo del angulo, eliminarla
+            lookAt.Normalize();
+
+            // al normalizarlos, evita tener que dividir por el producto de sus modulos (es 1)
+            float angle = FastMath.Acos(Vector3.Dot(lookAtInicialDelRifle, lookAt));
             
-            //lookAtAnterior = GuiController.Instance.FpsCamera.LookAt - GuiController.Instance.FpsCamera.Position;;
+            // compensa los cuadrantes superiores ya que el acos tiene una imagen entre 0 y pi
+            if (lookAt.X > 0.0f)
+                angle = FastMath.TWO_PI - angle;
+
+            // El orden y la separacion de las transformadas es muy importante.
+            // 1. Escalar
+            // 2. Alejar levemente del origen (efecto "en mis manos").
+            // 3. Rotarlo (al aplicar primero 2, esto logra que el rifle rote sobre el eje del jugador, y no sobre si mismo).
+            // 4. Moverlo a donde esta la camara.
+            rifle.Transform =
+                Matrix.Scaling(new Vector3(0.01f, 0.01f, 0.01f)) *
+                Matrix.Translation(new Vector3(-0.5f, -1.0f, -2.0f)) *
+                Matrix.RotationYawPitchRoll(angle, 0.0f, 0.0f) *
+                Matrix.Translation(GuiController.Instance.FpsCamera.Position)
+                ;
+
+            //lookAtAnterior = lookAt;
 
             //Capturar Input teclado 
             if (GuiController.Instance.D3dInput.keyPressed(Microsoft.DirectX.DirectInput.Key.F))
