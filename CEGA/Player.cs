@@ -18,7 +18,6 @@ namespace AlumnoEjemplos.CEGA
     {
         TgcMesh rifle;
         Vector3 lookAtInicialDelRifle;
-        Vector3 posicionAnterior;
 
         public Player()
         {
@@ -44,7 +43,7 @@ namespace AlumnoEjemplos.CEGA
             camera.Enable = true;
             //Configurar posicion y hacia donde se mira
             camera.setCamera(rifle.Position, new Vector3(0.0f, 0.0f, 0.0f));
-            camera.MovementSpeed = 20.0f;
+            camera.MovementSpeed = 200.0f;
 
             // hacia donde mira el rifle, sin transformaciones
             lookAtInicialDelRifle = new Vector3(0.0f, 0.0f, -1.0f);
