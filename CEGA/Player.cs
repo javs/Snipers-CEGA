@@ -91,14 +91,6 @@ namespace AlumnoEjemplos.CEGA
                 Matrix.Translation(GuiController.Instance.FpsCamera.Position)
                 ;
 
-            //lookAtAnterior = lookAt;
-
-            //Capturar Input teclado 
-            if (GuiController.Instance.D3dInput.keyPressed(Microsoft.DirectX.DirectInput.Key.F))
-            {
-                //Tecla F apretada
-            }
-
             //Capturar Input Mouse
             if (GuiController.Instance.D3dInput.buttonPressed(TgcViewer.Utils.Input.TgcD3dInput.MouseButtons.BUTTON_LEFT))
             {
