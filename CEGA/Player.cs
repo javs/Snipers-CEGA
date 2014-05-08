@@ -18,6 +18,10 @@ namespace AlumnoEjemplos.CEGA
     {
         TgcMesh rifle;
         Vector3 lookAtInicialDelRifle;
+        Boolean scope;
+        Matrix matrizSinZoom = GuiController.Instance.D3dDevice.Transform.Projection;
+        Matrix matrizConZoom = GuiController.Instance.D3dDevice.Transform.Projection;
+
 
         public Player()
         {
@@ -43,19 +47,27 @@ namespace AlumnoEjemplos.CEGA
             camera.Enable = true;
             //Configurar posicion y hacia donde se mira
             camera.setCamera(rifle.Position, new Vector3(0.0f, 0.0f, 0.0f));
-            camera.MovementSpeed = 200.0f;
+            camera.MovementSpeed = 100.0f;
 
             // hacia donde mira el rifle, sin transformaciones
             lookAtInicialDelRifle = new Vector3(0.0f, 0.0f, -1.0f);
             lookAtInicialDelRifle.Normalize();
 
             rifle.AutoTransformEnable = false;
+
+            //Proporcion del zoom. M11 y M22 están afectados por el FoV, modificando el FoV generamos el efecto
+            matrizConZoom.M11 *= 2;
+            matrizConZoom.M22 *= 2;
         }
 
         public void update(float elapsedTime)
         {
+
+            //Declaro la camara para simplificar un poco
+            TgcFpsCamera camera = GuiController.Instance.FpsCamera;
+
             // FpsCamera traslada el vector a la posicion de la camara. Eso complica los calculos, asique aca se substrae.
-            Vector3 lookAt = GuiController.Instance.FpsCamera.LookAt - GuiController.Instance.FpsCamera.Position;
+            Vector3 lookAt = camera.LookAt - camera.Position;
 
             lookAt.Y = 0; // la posicion vertical interfiere con el calculo del angulo, eliminarla
             lookAt.Normalize();
@@ -92,6 +104,40 @@ namespace AlumnoEjemplos.CEGA
             {
                 //Boton izq apretado
             }
+
+            if (GuiController.Instance.D3dInput.buttonPressed(TgcViewer.Utils.Input.TgcD3dInput.MouseButtons.BUTTON_RIGHT))
+            {
+
+                //Me fijo el estado del scope, cambio la matriz de proyeccion y la velocidad de rotación del mouse (para disminuir la sens y que el mouse no vuele con el zoom)
+                if (scope)
+                {
+                    scope = false;
+                    GuiController.Instance.D3dDevice.Transform.Projection = matrizSinZoom;
+                    camera.RotationSpeed = 1;
+                }
+                else
+                {
+                    scope = true;
+                    GuiController.Instance.D3dDevice.Transform.Projection = matrizConZoom;
+                    camera.RotationSpeed = .4F;
+                }
+            }
+
+            //Corremos con shift
+            if (GuiController.Instance.D3dInput.keyPressed(Microsoft.DirectX.DirectInput.Key.LeftShift))
+            {
+                    camera.MovementSpeed = 200.0f;
+            }
+
+            //Dejamos de correr si se levanta el shift
+            if (GuiController.Instance.D3dInput.keyUp(Microsoft.DirectX.DirectInput.Key.LeftShift)) 
+            {
+                     camera.MovementSpeed = 100.0f;
+            }
+
+
+
+
         }
 
         public void render()
