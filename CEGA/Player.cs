@@ -18,14 +18,17 @@ namespace AlumnoEjemplos.CEGA
     {
         TgcMesh rifle;
         Vector3 lookAtInicialDelRifle;
-        Boolean scope;
+        Boolean scope = false;
+        float zoom = 1;
         Matrix matrizSinZoom = GuiController.Instance.D3dDevice.Transform.Projection;
         Matrix matrizConZoom = GuiController.Instance.D3dDevice.Transform.Projection;
+
 
 
         public Player()
         {
             TgcSceneLoader loaderSniper = new TgcSceneLoader();
+
 
             // Alex: Este modelo no carga bien, ya le pregunte al tutor para ver cual puede ser el problema
             TgcScene sniperRifle = loaderSniper.loadSceneFromFile(
@@ -55,14 +58,11 @@ namespace AlumnoEjemplos.CEGA
 
             rifle.AutoTransformEnable = false;
 
-            //Proporcion del zoom. M11 y M22 están afectados por el FoV, modificando el FoV generamos el efecto
-            matrizConZoom.M11 *= 2;
-            matrizConZoom.M22 *= 2;
         }
 
         public void update(float elapsedTime)
         {
-
+           
             //Declaro la camara para simplificar un poco
             TgcFpsCamera camera = GuiController.Instance.FpsCamera;
 
@@ -91,43 +91,64 @@ namespace AlumnoEjemplos.CEGA
                 Matrix.Translation(GuiController.Instance.FpsCamera.Position)
                 ;
 
-            //Capturar Input Mouse
-            if (GuiController.Instance.D3dInput.buttonPressed(TgcViewer.Utils.Input.TgcD3dInput.MouseButtons.BUTTON_LEFT))
+            //Corremos con shift
+            if (GuiController.Instance.D3dInput.keyPressed(Microsoft.DirectX.DirectInput.Key.LeftShift))
             {
-                //Boton izq apretado
+                camera.MovementSpeed = 200.0f;
             }
+
+            //Dejamos de correr si se levanta el shift
+            if (GuiController.Instance.D3dInput.keyUp(Microsoft.DirectX.DirectInput.Key.LeftShift))
+            {
+                camera.MovementSpeed = 100.0f;
+            }
+
 
             if (GuiController.Instance.D3dInput.buttonPressed(TgcViewer.Utils.Input.TgcD3dInput.MouseButtons.BUTTON_RIGHT))
             {
 
                 //Me fijo el estado del scope, cambio la matriz de proyeccion y la velocidad de rotación del mouse (para disminuir la sens y que el mouse no vuele con el zoom)
+
+                //Si les parece podemos definir constantes zoomInicial = 1.2f, zoomWheel = 0.4f, zoomMAX = 3 para que quede mejor el código. Por ahora lo dejo así
+
                 if (scope)
                 {
                     scope = false;
-                    GuiController.Instance.D3dDevice.Transform.Projection = matrizSinZoom;
+                    zoom = 1;
                     camera.RotationSpeed = 1;
                 }
                 else
                 {
                     scope = true;
-                    GuiController.Instance.D3dDevice.Transform.Projection = matrizConZoom;
+                    zoom = 1.4f;
                     camera.RotationSpeed = .4F;
                 }
+
             }
 
-            //Corremos con shift
-            if (GuiController.Instance.D3dInput.keyPressed(Microsoft.DirectX.DirectInput.Key.LeftShift))
+
+            //Zoom con la rueda del mouse, SOLO si el scope esta activado
+            if (scope)
             {
-                    camera.MovementSpeed = 200.0f;
-            }
-
-            //Dejamos de correr si se levanta el shift
-            if (GuiController.Instance.D3dInput.keyUp(Microsoft.DirectX.DirectInput.Key.LeftShift)) 
-            {
-                     camera.MovementSpeed = 100.0f;
+                if (GuiController.Instance.D3dInput.WheelPos > 0)
+                    zoom += 0.8f;
+                if (GuiController.Instance.D3dInput.WheelPos < 0)
+                    zoom -= 0.8f;
             }
 
 
+            //Limito los valores del zoom
+            if (zoom > 3.8)
+                zoom = 3.8f;
+            if (zoom < 1)
+                zoom = 1;
+
+            //Refresco el zoom y lo mando a procesar
+
+            matrizConZoom.M11 = matrizSinZoom.M11 * zoom;
+            matrizConZoom.M22 = matrizSinZoom.M22 * zoom;
+
+            GuiController.Instance.D3dDevice.Transform.Projection = matrizConZoom;
 
 
         }
