@@ -2,9 +2,11 @@
 using Microsoft.DirectX.Direct3D;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using TgcViewer;
+using TgcViewer.Utils._2D;
 using TgcViewer.Utils.Input;
 using TgcViewer.Utils.TgcGeometry;
 using TgcViewer.Utils.TgcSceneLoader;
@@ -23,22 +25,23 @@ namespace AlumnoEjemplos.CEGA
         Matrix matrizSinZoom = GuiController.Instance.D3dDevice.Transform.Projection;
         Matrix matrizConZoom = GuiController.Instance.D3dDevice.Transform.Projection;
 
-
+        TgcSprite scope_stencil;
 
         public Player()
         {
             TgcSceneLoader loaderSniper = new TgcSceneLoader();
 
+            string media = GuiController.Instance.AlumnoEjemplosMediaDir + "\\";
 
             // Alex: Este modelo no carga bien, ya le pregunte al tutor para ver cual puede ser el problema
-            TgcScene sniperRifle = loaderSniper.loadSceneFromFile(
-                GuiController.Instance.AlumnoEjemplosMediaDir + "\\Sniper-TgcScene.xml");
+            TgcScene sniperRifle = loaderSniper.loadSceneFromFile(media + "Sniper-TgcScene.xml");
 
             // De toda la escena solo nos interesa guardarnos el primer modelo (el único que hay en este caso).
             rifle = sniperRifle.Meshes[0];
             rifle.Position = new Vector3(125.0f, 5.0f, 125.0f);
             rifle.AlphaBlendEnable = true;
             rifle.Scale = new Vector3(0.01f, 0.01f, 0.01f);
+            rifle.AutoTransformEnable = false;
 
             // Configuracion de la camara
             //
@@ -56,8 +59,20 @@ namespace AlumnoEjemplos.CEGA
             lookAtInicialDelRifle = new Vector3(0.0f, 0.0f, -1.0f);
             lookAtInicialDelRifle.Normalize();
 
-            rifle.AutoTransformEnable = false;
+            scope_stencil = new TgcSprite();
+            scope_stencil.Texture = TgcTexture.createTexture(media + "Textures\\scope_hi.png");
 
+            // Centrado en el medio de la pantalla
+            Size screenSize = GuiController.Instance.Panel3d.Size;
+            Size textureSize = scope_stencil.Texture.Size;
+
+            scope_stencil.Scaling = new Vector2(
+                (float)screenSize.Width / textureSize.Width,
+                (float)screenSize.Height / textureSize.Height);
+
+            scope_stencil.Position = new Vector2(
+                FastMath.Max(screenSize.Width / 2 - textureSize.Width * scope_stencil.Scaling.X / 2, 0),
+                FastMath.Max(screenSize.Height / 2 - textureSize.Height * scope_stencil.Scaling.Y / 2, 0));
         }
 
         public void update(float elapsedTime)
@@ -155,7 +170,16 @@ namespace AlumnoEjemplos.CEGA
 
         public void render()
         {
-            rifle.render();
+            if (scope)
+            {
+                GuiController.Instance.Drawer2D.beginDrawSprite();
+                scope_stencil.render();
+                GuiController.Instance.Drawer2D.endDrawSprite();
+            }
+            else
+            {
+                rifle.render();
+            }
         }
 
         public void dispose()
