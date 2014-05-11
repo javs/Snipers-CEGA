@@ -16,7 +16,7 @@ namespace AlumnoEjemplos.CEGA
     /// <summary>
     /// Representa al administrador de enemigos.
     /// </summary>
-    class EnemigosAdmin : IRenderObject, IUpdatable
+    class EnemigosAdmin : IRenderable, IUpdatable
     {
 
         Vector3 limiteTerrenoInferior;
@@ -36,18 +36,18 @@ namespace AlumnoEjemplos.CEGA
             int i;
             for(i = 0; i < (int)spawnEnemigos; i++)
             {
-                this.agregarEnemigo();
+                this.AgregarEnemigo();
             }
         }
 
-        private void agregarEnemigo()
+        private void AgregarEnemigo()
         {
-            Vector3 posicion = this.posicionEnemigo();
+            Vector3 posicion = this.PosicionEnemigo();
             Enemigo enemigo = new Enemigo(posicion);
             listaEnemigos.Add(enemigo);
         }
 
-        private Vector3 posicionEnemigo()
+        private Vector3 PosicionEnemigo()
         {
             Vector3 posicion;
             bool posicionEnTerreno;
@@ -75,7 +75,7 @@ namespace AlumnoEjemplos.CEGA
             return posicion;
         }
 
-        public void update(float elapsedTime)
+        public void Update(float elapsedTime)
         {
             int spawnEnemigosOld = (int)spawnEnemigos;
             velocidadSpawn += aceleracionSpawn * elapsedTime;
@@ -84,35 +84,35 @@ namespace AlumnoEjemplos.CEGA
 
             for (int i = 0; i < restaSpawnEnemigos; i++)
             {
-                this.agregarEnemigo();
+                this.AgregarEnemigo();
             }
 
             foreach (Enemigo enemigo in listaEnemigos)
             {
-                enemigo.update(elapsedTime);
+                enemigo.Update(elapsedTime);
             }
         }
     
-        public void render()
+        public void Render(Snipers scene)
         {
             foreach (Enemigo enemigo in listaEnemigos)
             {
-                enemigo.render();
+                enemigo.Render(scene);
             }
         }
 
-        public void dispose()
+        public void RenderUI(Snipers scene)
+        {
+        }
+
+        public void Dispose()
         {
             foreach (Enemigo enemigo in listaEnemigos)
             {
-                enemigo.dispose();
+                enemigo.Dispose();
             }
         }
-
-        public bool AlphaBlendEnable { get; set; }
     
     }
-
-
 
 }

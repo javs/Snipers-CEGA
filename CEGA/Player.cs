@@ -12,7 +12,7 @@ namespace AlumnoEjemplos.CEGA
     /// <summary>
     /// Representa al jugador. Tiene control de la camara.
     /// </summary>
-    class Player : IRenderObject, IUpdatable
+    class Player : IRenderable, IUpdatable
     {
         TgcMesh rifle;
         Vector3 lookAtInicialDelRifle;
@@ -70,7 +70,7 @@ namespace AlumnoEjemplos.CEGA
                 FastMath.Max(screenSize.Height / 2 - textureSize.Height * scope_stencil.Scaling.Y / 2, 0));
         }
 
-        public void update(float elapsedTime)
+        public void Update(float elapsedTime)
         {
             TgcFpsCamera camera = GuiController.Instance.FpsCamera;
 
@@ -117,7 +117,7 @@ namespace AlumnoEjemplos.CEGA
                     zoom = 1;
             }
             else
-                updateRifle();
+                UpdateRifle();
 
             matrizConZoom.M11 = matrizSinZoom.M11 * zoom;
             matrizConZoom.M22 = matrizSinZoom.M22 * zoom;
@@ -128,7 +128,7 @@ namespace AlumnoEjemplos.CEGA
         /// <summary>
         /// Actualiza la posicion del rifle, para que siga a la camara
         /// </summary>
-        private void updateRifle()
+        private void UpdateRifle()
         {
             TgcFpsCamera camera = GuiController.Instance.FpsCamera;
 
@@ -158,7 +158,15 @@ namespace AlumnoEjemplos.CEGA
                 ;
         }
 
-        public void render()
+        public void Render(Snipers scene)
+        {
+            if (!scope)
+                rifle.render();
+
+            scene.PostProcessing.LensDistortion = scope;
+        }
+
+        public void RenderUI(Snipers scene)
         {
             if (scope)
             {
@@ -166,17 +174,11 @@ namespace AlumnoEjemplos.CEGA
                 scope_stencil.render();
                 GuiController.Instance.Drawer2D.endDrawSprite();
             }
-            else
-            {
-                rifle.render();
-            }
         }
 
-        public void dispose()
+        public void Dispose()
         {
             rifle.dispose();
         }
-
-        public bool AlphaBlendEnable { get; set; }
     }
 }

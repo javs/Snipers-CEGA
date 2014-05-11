@@ -16,7 +16,7 @@ namespace AlumnoEjemplos.CEGA
     /// <summary>
     /// Representa a un enemigo.
     /// </summary>
-    class Enemigo : IRenderObject, IUpdatable
+    class Enemigo : IRenderable, IUpdatable
     {
         TgcSkeletalMesh enemigo;
         List<string> meshEnemigos = new List<string>();
@@ -50,7 +50,7 @@ namespace AlumnoEjemplos.CEGA
             
         }
 
-        public void update(float elapsedTime)
+        public void Update(float elapsedTime)
         {
             int velocidadEnemigo = 10;
             Vector3 posicionPlayer = GuiController.Instance.CurrentCamera.getPosition();
@@ -74,17 +74,19 @@ namespace AlumnoEjemplos.CEGA
 
         }
 
-        public void render()
+        public void Render(Snipers scene)
         {
             enemigo.render();
         }
 
-        public void dispose()
+        public void RenderUI(Snipers scene)
+        {
+        }
+
+        public void Dispose()
         {
             enemigo.dispose();
         }
-
-        public bool AlphaBlendEnable { get; set; }
 
     }
 }

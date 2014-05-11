@@ -10,6 +10,6 @@ namespace AlumnoEjemplos.CEGA
     /// </summary>
     interface IUpdatable
     {
-        void update(float elapsedTime);
+        void Update(float elapsedTime);
     }
 }

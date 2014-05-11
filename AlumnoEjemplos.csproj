@@ -89,7 +89,7 @@
   <ItemGroup>
     <Compile Include="CEGA\Enemigo.cs" />
     <Compile Include="CEGA\EnemigosAdmin.cs" />
-    <Compile Include="CEGA\IUpdatable.cs" />
+    <Compile Include="CEGA\IRenderable.cs" />    <Compile Include="CEGA\IUpdatable.cs" />
     <Compile Include="CEGA\Player.cs" />
     <Compile Include="CEGA\PlayScene.cs" />
     <Compile Include="CEGA\Snipers.cs" />

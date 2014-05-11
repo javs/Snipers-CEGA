@@ -11,7 +11,7 @@ namespace AlumnoEjemplos.CEGA
     /// <summary>
     /// Representa el escenario donde se juega, con terreno y objetos inanimados
     /// </summary>
-    class PlayScene : IRenderObject
+    class PlayScene : IRenderable
     {
         private TgcBox suelo;
         private TgcSkyBox skyBox;
@@ -89,7 +89,7 @@ namespace AlumnoEjemplos.CEGA
             skyBox.updateValues();
         }
 
-        public void render()
+        public void Render(Snipers scene)
         {
             suelo.render();
             skyBox.render();
@@ -100,7 +100,12 @@ namespace AlumnoEjemplos.CEGA
             }
         }
 
-        public void dispose()
+        public void RenderUI(Snipers scene)
+        {
+
+        }
+
+        public void Dispose()
         {
             skyBox.dispose();
             suelo.dispose();
@@ -110,9 +115,6 @@ namespace AlumnoEjemplos.CEGA
                 mesh.dispose();
             }
         }
-
-        public bool AlphaBlendEnable { get; set; }
-
         public TgcBoundingBox limitesTerreno()
         {
             return suelo.BoundingBox;
