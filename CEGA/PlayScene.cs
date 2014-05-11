@@ -113,5 +113,10 @@ namespace AlumnoEjemplos.CEGA
 
         public bool AlphaBlendEnable { get; set; }
 
+        public TgcBoundingBox limitesTerreno()
+        {
+            return suelo.BoundingBox;
+        }
+
     }
 }

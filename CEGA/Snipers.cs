@@ -34,6 +34,7 @@ namespace AlumnoEjemplos.CEGA
 
         PlayScene playScene;
         Player player;
+        EnemigosAdmin enemigosAdmin;
 
         /// <summary>
         /// Método que se llama una sola vez,  al principio cuando se ejecuta el ejemplo.
@@ -45,6 +46,7 @@ namespace AlumnoEjemplos.CEGA
         {
             playScene = new PlayScene();
             player = new Player();
+            enemigosAdmin = new EnemigosAdmin(playScene);
         }
 
 
@@ -58,9 +60,11 @@ namespace AlumnoEjemplos.CEGA
         public override void render(float elapsedTime)
         {
             player.update(elapsedTime);
+            enemigosAdmin.update(elapsedTime);
 
             playScene.render();
             player.render();
+            enemigosAdmin.render();
         }
 
         /// <summary>
@@ -71,6 +75,7 @@ namespace AlumnoEjemplos.CEGA
         {
             playScene.dispose();
             player.dispose();
+            enemigosAdmin.dispose();
         }
 
     }
