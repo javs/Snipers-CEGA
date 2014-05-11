@@ -87,6 +87,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CEGA\Enemigo.cs" />
+    <Compile Include="CEGA\EnemigosAdmin.cs" />
     <Compile Include="CEGA\IUpdatable.cs" />
     <Compile Include="CEGA\Player.cs" />
     <Compile Include="CEGA\PlayScene.cs" />
