@@ -1,8 +1,6 @@
 ﻿using Microsoft.DirectX;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using TgcViewer;
 using TgcViewer.Utils.TgcGeometry;
 using TgcViewer.Utils.TgcSceneLoader;
@@ -70,8 +68,6 @@ namespace AlumnoEjemplos.CEGA
                 }
             }
 
-
-
             //Sky Box
 
             string texturesPath = mediaDir + "Skyboxes\\SkyBox4\\";
@@ -79,7 +75,7 @@ namespace AlumnoEjemplos.CEGA
             //Creo el SkyBox 
             skyBox = new TgcSkyBox();
             skyBox.Center = new Vector3(1300, 250, 1300);
-            skyBox.Size = new Vector3(4000, 2500, 4000);
+            skyBox.Size = new Vector3(4000, 1500, 4000);
 
             //Cargo las texturas de las caras, (algunas no tienen "down" así que uso TOP, por que igual no se debería ver en nuestro caso)
             skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Up, texturesPath + "top.jpg");
@@ -89,8 +85,6 @@ namespace AlumnoEjemplos.CEGA
             skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Front, texturesPath + "front.jpg");
             skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Back, texturesPath + "back.jpg");
 
-
-
             //Actualizar todos los valores para crear el SkyBox
             skyBox.updateValues();
         }
@@ -99,6 +93,7 @@ namespace AlumnoEjemplos.CEGA
         {
             suelo.render();
             skyBox.render();
+
             foreach (var mesh in otrosObjetos)
             {
                 mesh.render();
@@ -110,7 +105,6 @@ namespace AlumnoEjemplos.CEGA
             skyBox.dispose();
             suelo.dispose();
 
-            
             foreach (var mesh in otrosObjetos)
             {
                 mesh.dispose();
