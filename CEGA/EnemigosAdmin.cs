@@ -58,17 +58,18 @@ namespace AlumnoEjemplos.CEGA
                 Vector3 posicionPlayer = GuiController.Instance.CurrentCamera.getPosition();
 
                 int distanciaRandom = randomEnemigosAdmin.Next(80, 150);
-                float anguloRandom = (randomEnemigosAdmin.Next(0, 100) / 50) * FastMath.PI;
+                float anguloRandom = ((float)randomEnemigosAdmin.Next(0, 100) / 50) * FastMath.PI;
 
-                double posicionX = distanciaRandom * Math.Cos(anguloRandom);
-                double posicionZ = distanciaRandom * Math.Sin(anguloRandom);
+                float posicionX = distanciaRandom * FastMath.Cos(anguloRandom);
+                float posicionZ = distanciaRandom * FastMath.Sin(anguloRandom);
 
                 posicion = new Vector3((int)(posicionPlayer.X + posicionX), 0, (int)(posicionPlayer.Z + posicionZ));
 
-                posicionEnTerreno = posicion.X > limiteTerrenoInferior.X;
-                posicionEnTerreno = posicion.Z > limiteTerrenoInferior.Z;
-                posicionEnTerreno = posicion.X < limiteTerrenoSuperior.X;
-                posicionEnTerreno = posicion.Z < limiteTerrenoSuperior.Z;
+                posicionEnTerreno = true;
+                posicionEnTerreno = posicionEnTerreno && posicion.X > limiteTerrenoInferior.X;
+                posicionEnTerreno = posicionEnTerreno && posicion.Z > limiteTerrenoInferior.Z;
+                posicionEnTerreno = posicionEnTerreno && posicion.X < limiteTerrenoSuperior.X;
+                posicionEnTerreno = posicionEnTerreno && posicion.Z < limiteTerrenoSuperior.Z;
 
             } while (posicionEnTerreno == false);
 

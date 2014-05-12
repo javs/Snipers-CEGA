@@ -52,7 +52,7 @@ namespace AlumnoEjemplos.CEGA
 
         public void Update(float elapsedTime)
         {
-            int velocidadEnemigo = 10;
+            int velocidadEnemigo = randomEnemigo.Next(10, 15);
             Vector3 posicionPlayer = GuiController.Instance.CurrentCamera.getPosition();
 
             // vector con direccion al jugador
