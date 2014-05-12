@@ -6,6 +6,7 @@ using TgcViewer.Utils._2D;
 using TgcViewer.Utils.Input;
 using TgcViewer.Utils.TgcGeometry;
 using TgcViewer.Utils.TgcSceneLoader;
+using TgcViewer.Utils.Sound;
 
 namespace AlumnoEjemplos.CEGA
 {
@@ -16,12 +17,21 @@ namespace AlumnoEjemplos.CEGA
     {
         TgcMesh rifle;
         Vector3 lookAtInicialDelRifle;
+        Vector3 posicionAnteriorCamara;
         Boolean scope = false;
         float zoom = 1.0f;
         Matrix matrizSinZoom = GuiController.Instance.D3dDevice.Transform.Projection;
         Matrix matrizConZoom = GuiController.Instance.D3dDevice.Transform.Projection;
 
+        TgcStaticSound sound_Zoom;
+        TgcStaticSound sound_Walk;
+
         TgcSprite scope_stencil;
+
+        //Constantes
+        const int zoomMaximo = 3;
+        const float zoomWheel = 1.2F;
+        const float zoomBase = 1.4F;
 
         public Player()
         {
@@ -50,6 +60,9 @@ namespace AlumnoEjemplos.CEGA
             camera.setCamera(rifle.Position, new Vector3(0.0f, 0.0f, 0.0f));
             camera.MovementSpeed = 100.0f;
 
+            //Inicializo la pos de la camara
+            posicionAnteriorCamara = camera.Position;
+
             // hacia donde mira el rifle, sin transformaciones
             lookAtInicialDelRifle = new Vector3(0.0f, 0.0f, -1.0f);
             lookAtInicialDelRifle.Normalize();
@@ -68,6 +81,14 @@ namespace AlumnoEjemplos.CEGA
             scope_stencil.Position = new Vector2(
                 FastMath.Max(screenSize.Width / 2 - textureSize.Width * scope_stencil.Scaling.X / 2, 0),
                 FastMath.Max(screenSize.Height / 2 - textureSize.Height * scope_stencil.Scaling.Y / 2, 0));
+
+            //Instancio los sonidos
+
+            sound_Zoom = new TgcStaticSound();
+            sound_Walk = new TgcStaticSound();
+
+            sound_Zoom.loadSound(media + "Sound\\zoom.wav");
+            sound_Walk.loadSound(media + "Sound\\pl_dirt1.wav");
         }
 
         public void Update(float elapsedTime)
@@ -80,20 +101,28 @@ namespace AlumnoEjemplos.CEGA
             else if (GuiController.Instance.D3dInput.keyUp(Microsoft.DirectX.DirectInput.Key.LeftShift))
                 camera.MovementSpeed = 100.0f;
 
+
+            // Sonido al caminar
+
+            if (posicionAnteriorCamara != camera.Position)
+            {
+                sound_Walk.play();
+                posicionAnteriorCamara = camera.Position;
+            }
             // Activa el scope
             if (GuiController.Instance.D3dInput.buttonPressed(TgcViewer.Utils.Input.TgcD3dInput.MouseButtons.BUTTON_RIGHT))
             {
                 // Me fijo el estado del scope, cambio la matriz de proyeccion y la velocidad de rotación del mouse
                 // (para disminuir la sens y que el mouse no vuele con el zoom)
 
-                // TODO Alex: Si les parece podemos definir constantes zoomInicial = 1.2f, zoomWheel = 0.4f,
-                // zoomMAX = 3 para que quede mejor el código. Por ahora lo dejo así
+                //Reproduzco el sonido del zoom
+                sound_Zoom.play();
 
                 scope = !scope;
-
+                
                 if (scope)
                 {
-                    zoom = 1.4f;
+                    zoom = zoomBase;
                     camera.RotationSpeed = .4F;
                 }
                 else
@@ -107,14 +136,18 @@ namespace AlumnoEjemplos.CEGA
             if (scope)
             {
                 if (GuiController.Instance.D3dInput.WheelPos > 0)
-                    zoom += 0.8f;
+                    zoom += zoomWheel;
                 if (GuiController.Instance.D3dInput.WheelPos < 0)
-                    zoom -= 0.8f;
+                    zoom -= zoomWheel;
 
-                if (zoom > 3.8)
-                    zoom = 3.8f;
-                if (zoom < 1)
-                    zoom = 1;
+                if (GuiController.Instance.D3dInput.WheelPos != 0 && zoom <= (zoomBase + zoomMaximo*zoomWheel) && zoom >= 1)
+                    sound_Zoom.play();
+
+
+                if (zoom > zoomBase + (zoomWheel*zoomMaximo))
+                    zoom = zoomBase + (zoomWheel*zoomMaximo);
+                if (zoom < zoomBase)
+                    zoom = zoomBase;
             }
             else
                 UpdateRifle();
