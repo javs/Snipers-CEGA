@@ -20,6 +20,7 @@ namespace AlumnoEjemplos.CEGA
         Vector3 posicionAnteriorCamara;
         Boolean scope = false;
         float zoom = 1.0f;
+
         Matrix matrizSinZoom = GuiController.Instance.D3dDevice.Transform.Projection;
         Matrix matrizConZoom = GuiController.Instance.D3dDevice.Transform.Projection;
 
@@ -37,7 +38,7 @@ namespace AlumnoEjemplos.CEGA
         {
             TgcSceneLoader loaderSniper = new TgcSceneLoader();
 
-            string media = GuiController.Instance.AlumnoEjemplosMediaDir + "\\";
+            string media = GuiController.Instance.AlumnoEjemplosMediaDir;
 
             TgcScene sniperRifle = loaderSniper.loadSceneFromFile(media + "Sniper-TgcScene.xml");
 
@@ -68,7 +69,7 @@ namespace AlumnoEjemplos.CEGA
             lookAtInicialDelRifle.Normalize();
 
             scope_stencil = new TgcSprite();
-            scope_stencil.Texture = TgcTexture.createTexture(media + "Textures\\scope_hi.png");
+            scope_stencil.Texture = TgcTexture.createTexture(media + @"Textures\scope_hi.png");
 
             // Centrado en el medio de la pantalla
             Size screenSize = GuiController.Instance.Panel3d.Size;
@@ -82,13 +83,16 @@ namespace AlumnoEjemplos.CEGA
                 FastMath.Max(screenSize.Width / 2 - textureSize.Width * scope_stencil.Scaling.X / 2, 0),
                 FastMath.Max(screenSize.Height / 2 - textureSize.Height * scope_stencil.Scaling.Y / 2, 0));
 
-            //Instancio los sonidos
+            LoadSounds(media);
+        }
 
+        private void LoadSounds(string media)
+        {
             sound_Zoom = new TgcStaticSound();
             sound_Walk = new TgcStaticSound();
 
-            sound_Zoom.loadSound(media + "Sound\\zoom.wav");
-            sound_Walk.loadSound(media + "Sound\\pl_dirt1.wav");
+            sound_Zoom.loadSound(media + @"Sound\zoom.wav", -1000);
+            sound_Walk.loadSound(media + @"Sound\pl_dirt1.wav", -2000);
         }
 
         public void Update(float elapsedTime)
@@ -212,6 +216,9 @@ namespace AlumnoEjemplos.CEGA
         public void Dispose()
         {
             rifle.dispose();
+            sound_Walk.dispose();
+            sound_Zoom.dispose();
+            scope_stencil.dispose();
         }
     }
 }

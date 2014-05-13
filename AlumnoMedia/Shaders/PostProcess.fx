@@ -40,15 +40,6 @@ float4 ps_noeffect(float2 Texcoord : TEXCOORD0) : COLOR0
 	return tex2D(pre_render_sampler, Texcoord);
 }
 
-technique NoEffect
-{
-	pass Pass_0
-	{
-		VertexShader = compile vs_3_0 vs_noeffect();
-		PixelShader  = compile ps_3_0 ps_noeffect();
-	}
-}
-
 // Crea un efecto simple que solo permite ver un circulo en el centro
 float4 ps_lens_simple(float2 tex : TEXCOORD0) : COLOR0
 {
@@ -57,15 +48,6 @@ float4 ps_lens_simple(float2 tex : TEXCOORD0) : COLOR0
 	color *= smoothstep(0.68, 0.15, dist);
 
 	return color;
-}
-
-technique LensSimple
-{
-	pass Pass_0
-	{
-		VertexShader = compile vs_3_0 vs_noeffect();
-		PixelShader  = compile ps_3_0 ps_lens_simple();
-	}
 }
 
 /*
@@ -119,6 +101,25 @@ float4 ps_lens_distortion(float2 tex : TEXCOORD0) : COLOR0
 	return float4(inputDistordR.r, inputDistordG.g, inputDistordB.b + 0.02f, 1);
 }
 
+
+technique NoEffect
+{
+	pass Pass_0
+	{
+		VertexShader = compile vs_3_0 vs_noeffect();
+		PixelShader = compile ps_3_0 ps_noeffect();
+	}
+}
+
+technique LensSimple
+{
+	pass Pass_0
+	{
+		VertexShader = compile vs_3_0 vs_noeffect();
+		PixelShader = compile ps_3_0 ps_lens_simple();
+	}
+}
+
 technique LensDistortion
 {
 	pass Pass_0
@@ -127,3 +128,4 @@ technique LensDistortion
 		PixelShader  = compile ps_3_0 ps_lens_distortion();
 	}
 }
+

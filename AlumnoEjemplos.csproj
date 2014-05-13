@@ -87,11 +87,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CEGA\Enemigo.cs" />
-    <Compile Include="CEGA\EnemigosAdmin.cs" />
-    <Compile Include="CEGA\IRenderable.cs" />    <Compile Include="CEGA\IUpdatable.cs" />
-    <Compile Include="CEGA\Player.cs" />
-    <Compile Include="CEGA\PlayScene.cs" />
+    <Compile Include="CEGA\Units\Enemigo.cs" />
+    <Compile Include="CEGA\Units\EnemigosAdmin.cs" />
+    <Compile Include="CEGA\Interfaces\IRenderable.cs" />
+    <Compile Include="CEGA\Interfaces\IUpdatable.cs" />
+    <Compile Include="CEGA\Units\Player.cs" />
+    <Compile Include="CEGA\Scenes\PlayScene.cs" />
     <Compile Include="CEGA\Snipers.cs" />
     <Compile Include="MiGrupo\EjemploAlumno.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -119,6 +120,7 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
