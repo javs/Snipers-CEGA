@@ -104,7 +104,7 @@ namespace AlumnoEjemplos.CEGA
 
             // Sonido al caminar
 
-            if (posicionAnteriorCamara != camera.Position)
+            if (posicionAnteriorCamara.X != camera.Position.X || posicionAnteriorCamara.Z != camera.Position.Z)
             {
                 sound_Walk.play();
                 posicionAnteriorCamara = camera.Position;
