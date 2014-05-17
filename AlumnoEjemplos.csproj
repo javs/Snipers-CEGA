@@ -91,6 +91,7 @@
     <Compile Include="CEGA\Units\EnemigosAdmin.cs" />
     <Compile Include="CEGA\Interfaces\IRenderable.cs" />
     <Compile Include="CEGA\Interfaces\IUpdatable.cs" />
+    <Compile Include="CEGA\Units\FpsCamera.cs" />
     <Compile Include="CEGA\Units\Player.cs" />
     <Compile Include="CEGA\Scenes\PlayScene.cs" />
     <Compile Include="CEGA\Snipers.cs" />
