@@ -1,6 +1,8 @@
 ﻿
 using Microsoft.DirectX;
 using Microsoft.DirectX.DirectInput;
+using System.Drawing;
+using System.Windows.Forms;
 using TgcViewer;
 using TgcViewer.Utils.Input;
 
@@ -64,11 +66,32 @@ namespace AlumnoEjemplos.CEGA.Units
         public float MovementSpeed { get; set; }
 
         /// <summary>
-        /// Cuanto mas rapido puede ir cuando camina hacia adelante.
+        /// Cuánto mas rapido puede ir cuando camina hacia adelante.
         /// </summary>
         public float ForwardFactor { get; set; }
 
         public float RotationSpeed { get; set; }
+
+        private bool lockMouse;
+        private Point screenCenter;
+
+        /// <summary>
+        /// Controla la captura del mouse.
+        /// </summary>
+        public bool LockMouse
+        {
+            set
+            {
+                lockMouse = value;
+
+                if (lockMouse)
+                    Cursor.Hide();
+                else
+                    Cursor.Show();
+            }
+
+            get { return lockMouse; }
+        }
 
         public FpsCamera()
         {
@@ -87,9 +110,18 @@ namespace AlumnoEjemplos.CEGA.Units
 
             MovementSpeed = 25.0f;
             ForwardFactor = 1.5f;
-            RotationSpeed = 0.2f;
+            RotationSpeed = 0.05f;
+
+            Control window = GuiController.Instance.D3dDevice.CreationParameters.FocusWindow;
+
+            screenCenter = window.PointToScreen(
+                new Point(window.Width / 2, window.Height / 2));
+
+            lockMouse = false;
 
             Enable = true;
+
+            setCamera(target, eye);
         }
 
         public Vector3 getPosition()
@@ -98,7 +130,8 @@ namespace AlumnoEjemplos.CEGA.Units
         }
 
         /// <returns>
-        /// Retorna el versor donde mira la camara, en relacion al mundo.
+        /// Retorna el vector donde mira la camara (a una distancia
+        /// de 1.0f del ojo), en relacion al mundo.
         /// </returns>
         public Vector3 getLookAt()
         {
@@ -130,11 +163,17 @@ namespace AlumnoEjemplos.CEGA.Units
             if (input.keyDown(Key.D))
                 move(xAxis * (MovementSpeed * elapsedTime));
 
-            float rotX = input.XposRelative * RotationSpeed;
-            float rotY = input.YposRelative * RotationSpeed;
+            if (input.keyPressed(Key.L))
+                LockMouse = !LockMouse;
+
+            float rotY = input.XposRelative * RotationSpeed;
+            float rotX = input.YposRelative * RotationSpeed;
             
             if (rotY != 0.0f || rotX != 0.0f)
                 look(rotX, rotY);
+
+            if (lockMouse)
+                Cursor.Position = screenCenter;
         }
 
         /// <summary>
@@ -144,7 +183,48 @@ namespace AlumnoEjemplos.CEGA.Units
         /// <param name="rotY"></param>
         private void look(float rotX, float rotY)
         {
-            // code me
+            Matrix rm =
+                Matrix.RotationAxis(xAxis, rotX) *
+                Matrix.RotationAxis(up, rotY);
+
+            Vector4 result;
+            
+            result = Vector3.Transform(xAxis, rm);
+            xAxis = new Vector3(result.X, result.Y, result.Z);
+
+            result = Vector3.Transform(yAxis, rm);
+            yAxis = new Vector3(result.X, result.Y, result.Z);
+
+            result = Vector3.Transform(zAxis, rm);
+            zAxis = new Vector3(result.X, result.Y, result.Z);
+
+            forward = Vector3.Cross(xAxis, up);
+            forward.Normalize();
+
+            target = eye + xAxis;
+
+            rotationChanged = true;
+        }
+
+        public void setCamera(Vector3 eye, Vector3 target)
+        {
+            this.eye = eye;
+            this.target = target;
+
+            zAxis = target - eye;
+            zAxis.Normalize();
+
+            xAxis = Vector3.Cross(up, zAxis);
+            xAxis.Normalize();
+
+            yAxis = Vector3.Cross(zAxis, xAxis);
+            yAxis.Normalize();
+
+            forward = Vector3.Cross(xAxis, up);
+            forward.Normalize();
+
+            rotationChanged = true;
+            positionChanged = true;
         }
 
         /// <summary>
@@ -181,18 +261,6 @@ namespace AlumnoEjemplos.CEGA.Units
                 return;
             
         Rotation:
-            zAxis = target - eye;
-            zAxis.Normalize();
-
-            xAxis = Vector3.Cross(up, zAxis);
-            xAxis.Normalize();
-
-            yAxis = Vector3.Cross(zAxis, xAxis);
-            yAxis.Normalize();
-
-            forward = Vector3.Cross(xAxis, up);
-            forward.Normalize();
-
             vM.M11 = xAxis.X;   vM.M12 = yAxis.X;   vM.M13 = zAxis.X; // (1,4) = 0
             vM.M21 = xAxis.Y;   vM.M22 = yAxis.Y;   vM.M23 = zAxis.Y; // (2,4) = 0
             vM.M31 = xAxis.Z;   vM.M32 = yAxis.Z;   vM.M33 = zAxis.Z; // (3,4) = 0
