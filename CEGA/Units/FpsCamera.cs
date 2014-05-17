@@ -123,12 +123,12 @@ namespace AlumnoEjemplos.CEGA.Units
             positionChanged = true;
             rotationChanged = true;
 
-            vM = Matrix.Identity;
-            rM = Matrix.Identity;
-            tM = Matrix.Identity;
-
             target  = new Vector3(0.0f, 5.0f, 1.0f);
             eye     = new Vector3(0.0f, 5.0f, 0.0f);
+
+            vM = Matrix.Identity;
+            rM = Matrix.Identity;
+            tM = Matrix.Translation(eye);
 
             xAxis   = new Vector3();
             yAxis   = new Vector3();
@@ -149,7 +149,7 @@ namespace AlumnoEjemplos.CEGA.Units
 
             Enable = true;
 
-            setCamera(target, eye);
+            setCamera(eye, target);
         }
 
         public Vector3 getPosition()
@@ -233,22 +233,24 @@ namespace AlumnoEjemplos.CEGA.Units
         /// <param name="rotY"></param>
         private void look(float rotX, float rotY)
         {
-            rM = Matrix.RotationAxis(xAxis, rotX) *
+            Matrix deltaRM = Matrix.RotationAxis(xAxis, rotX) *
                  Matrix.RotationAxis(up, rotY);
 
             Vector4 result;
-            
-            result = Vector3.Transform(xAxis, rM);
+
+            result = Vector3.Transform(xAxis, deltaRM);
             xAxis = new Vector3(result.X, result.Y, result.Z);
 
-            result = Vector3.Transform(yAxis, rM);
+            result = Vector3.Transform(yAxis, deltaRM);
             yAxis = new Vector3(result.X, result.Y, result.Z);
 
-            result = Vector3.Transform(zAxis, rM);
+            result = Vector3.Transform(zAxis, deltaRM);
             zAxis = new Vector3(result.X, result.Y, result.Z);
 
             // recalcular las dependencias
             //
+
+            rM *= deltaRM;
 
             forward = Vector3.Cross(xAxis, up);
             forward.Normalize();

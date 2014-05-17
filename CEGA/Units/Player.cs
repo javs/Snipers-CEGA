@@ -17,8 +17,8 @@ namespace AlumnoEjemplos.CEGA
     class Player : IRenderable, IUpdatable
     {
         TgcMesh rifle;
-        Vector3 lookAtInicialDelRifle;
-        Vector3 posicionAnteriorCamara;
+        Matrix rifleBaseTransforms;
+
         Boolean scope = false;
         float zoom = 1.0f;
 
@@ -37,9 +37,6 @@ namespace AlumnoEjemplos.CEGA
         const float zoomWheel = 1.2F;
         const float zoomBase = 1.4F;
 
-        Matrix rifleRotation;
-        Matrix rifleTranslation;
-
         public Player()
         {
             TgcSceneLoader loaderSniper = new TgcSceneLoader();
@@ -52,21 +49,16 @@ namespace AlumnoEjemplos.CEGA
             rifle.AlphaBlendEnable = true;
             rifle.AutoTransformEnable = false;
 
-            rifleRotation =
-                Matrix.Identity
-                //Matrix.Scaling(new Vector3(0.01f, 0.01f, 0.01f)) *
-                //Matrix.Scaling(new Vector3(0.08f, 0.08f, 0.08f))
-                //Matrix.Translation(new Vector3(-0.5f, -1.0f, -2.0f));
-                //Matrix.Translation(new Vector3(-2.0f, 5.0f, -5.0f))
-                ;
-
-            rifleTranslation = Matrix.Identity;
+            rifleBaseTransforms =
+                Matrix.Scaling(new Vector3(0.01f, 0.01f, 0.01f)) *
+                Matrix.RotationY(FastMath.PI - 0.03f) *
+                Matrix.Translation(new Vector3(0.5f, -1.0f, 2.0f));
 
             // Configuracion de la camara
             //
             GuiController.Instance.CurrentCamera.Enable = false;
             camera = new FpsCamera();
-            //GuiController.Instance.CurrentCamera = camera;
+            GuiController.Instance.CurrentCamera = camera;
 
             // Configuracion del stencil para el modo scope
             //
@@ -168,48 +160,10 @@ namespace AlumnoEjemplos.CEGA
         /// </summary>
         private void UpdateRifle()
         {
-            camera.updateCamera();
-
-            if (camera.RotationChanged)
-                rifleRotation *= camera.RotationMatrix;
-
             rifle.Transform =
-                Matrix.Scaling(new Vector3(0.01f, 0.01f, 0.01f)) *
-                //Matrix.Scaling(new Vector3(0.08f, 0.08f, 0.08f)) *
-                //Matrix.Translation(new Vector3(0f, 1.0f, 0f)) *
-                Matrix.Translation(new Vector3(-0.5f, -1.0f, -2.0f)) *
-                rifleRotation *
-                camera.TranslationMatrix 
-                
-                ;
-                //Matrix.Translation(new Vector3(-2.0f, 5.0f, -5.0f))
-
-            camera.updateViewMatrix(GuiController.Instance.D3dDevice);
-
-            //// FpsCamera traslada el vector a la posicion de la camara. Eso complica los calculos, asique aca se substrae.
-            //Vector3 lookAt = camera.LookAt - camera.Position;
-
-            //lookAt.Y = 0; // la posicion vertical interfiere con el calculo del angulo, eliminarla
-            //lookAt.Normalize();
-
-            //// al normalizarlos, evita tener que dividir por el producto de sus modulos (es 1)
-            //float angle = FastMath.Acos(Vector3.Dot(lookAtInicialDelRifle, lookAt));
-
-            //// compensa los cuadrantes superiores ya que el acos tiene una imagen entre 0 y pi
-            //if (lookAt.X > 0.0f)
-            //    angle = FastMath.TWO_PI - angle;
-
-            //// El orden y la separacion de las transformadas es muy importante.
-            //// 1. Escalar
-            //// 2. Alejar levemente del origen (efecto "en mis manos").
-            //// 3. Rotarlo (al aplicar primero 2, esto logra que el rifle rote sobre el eje del jugador, y no sobre si mismo).
-            //// 4. Moverlo a donde esta la camara.
-            //rifle.Transform =
-            //    Matrix.Scaling(new Vector3(0.01f, 0.01f, 0.01f)) *
-            //    Matrix.Translation(new Vector3(-0.5f, -1.0f, -2.0f)) *
-            //    Matrix.RotationYawPitchRoll(angle, 0.0f, 0.0f) *
-            //    Matrix.Translation(GuiController.Instance.FpsCamera.Position)
-            //    ;
+                rifleBaseTransforms *
+                camera.RotationMatrix *
+                camera.TranslationMatrix;
         }
 
         public void Render(Snipers scene)
