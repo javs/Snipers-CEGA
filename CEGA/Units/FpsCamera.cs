@@ -54,19 +54,24 @@ namespace AlumnoEjemplos.CEGA.Units
         Matrix vM;
 
         /// <summary>
-        /// Matriz de rotacion del ultimo cambio.
+        /// Matriz de rotacion absoluta.
         /// </summary>
         Matrix rM;
 
-        /// Matriz de traslacion del ultimo cambio.
-        Matrix tM;
-
-        public Matrix TranslationMatrix { get { return tM; } }
-
         /// <summary>
-        /// La matriz de rotacion que se le aplico a la camara en el ultimo update de rotacion.
+        /// Retorna la matriz de rotacion absoluta.
         /// </summary>
         public Matrix RotationMatrix { get { return rM; } }
+
+        /// <summary>
+        /// Matriz de traslacion absoluta.
+        /// </summary>
+        Matrix tM;
+
+        /// <summary>
+        /// Retorna la matriz de rotacion absoluta.
+        /// </summary>
+        public Matrix TranslationMatrix { get { return tM; } }
 
         /// <summary>
         /// true si la posicion cambio desde el ultimo render.
@@ -78,16 +83,6 @@ namespace AlumnoEjemplos.CEGA.Units
         /// </summary>
         bool rotationChanged;
 
-        /// <summary>
-        /// true si la posicion cambio en el ultimo update.
-        /// </summary>
-        public bool PositionChanged { get { return positionChanged; } }
-
-        /// <summary>
-        /// true si la rotacion cambio desde el ultimo update.
-        /// </summary>
-        public bool RotationChanged { get { return rotationChanged; } }
-
         public float MovementSpeed { get; set; }
 
         /// <summary>
@@ -95,10 +90,20 @@ namespace AlumnoEjemplos.CEGA.Units
         /// </summary>
         public float ForwardFactor { get; set; }
 
+        /// <summary>
+        /// Velocidad de rotacion.
+        /// </summary>
         public float RotationSpeed { get; set; }
 
+        /// <summary>
+        /// true si el mouse esta actualmente capturado por la camara.
+        /// </summary>
         private bool lockMouse;
-        private Point screenCenter;
+
+        /// <summary>
+        /// Centro de la ventana actual, en coordenadas de la pantalla.
+        /// </summary>
+        private Point windowCenter;
 
         /// <summary>
         /// Controla la captura del mouse.
@@ -128,7 +133,7 @@ namespace AlumnoEjemplos.CEGA.Units
 
             vM = Matrix.Identity;
             rM = Matrix.Identity;
-            tM = Matrix.Translation(eye);
+            tM = Matrix.Identity;
 
             xAxis   = new Vector3();
             yAxis   = new Vector3();
@@ -142,7 +147,7 @@ namespace AlumnoEjemplos.CEGA.Units
             Control window =
                 GuiController.Instance.D3dDevice.CreationParameters.FocusWindow;
 
-            screenCenter = window.PointToScreen(
+            windowCenter = window.PointToScreen(
                 new Point(window.Width / 2, window.Height / 2));
 
             lockMouse = false;
@@ -223,7 +228,7 @@ namespace AlumnoEjemplos.CEGA.Units
                 look(rotX, rotY);
 
             if (lockMouse)
-                Cursor.Position = screenCenter;
+                Cursor.Position = windowCenter;
         }
 
         /// <summary>
@@ -233,8 +238,9 @@ namespace AlumnoEjemplos.CEGA.Units
         /// <param name="rotY"></param>
         private void look(float rotX, float rotY)
         {
-            Matrix deltaRM = Matrix.RotationAxis(xAxis, rotX) *
-                 Matrix.RotationAxis(up, rotY);
+            Matrix deltaRM =
+                Matrix.RotationAxis(xAxis, rotX) *
+                Matrix.RotationAxis(up, rotY);
 
             Vector4 result;
 
@@ -276,6 +282,10 @@ namespace AlumnoEjemplos.CEGA.Units
 
             forward = Vector3.Cross(xAxis, up);
             forward.Normalize();
+
+            tM = Matrix.Translation(eye);
+
+            // \fixme actualizar rM
 
             rotationChanged = true;
             positionChanged = true;
