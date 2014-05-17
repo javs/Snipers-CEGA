@@ -54,6 +54,21 @@ namespace AlumnoEjemplos.CEGA.Units
         Matrix vM;
 
         /// <summary>
+        /// Matriz de rotacion del ultimo cambio.
+        /// </summary>
+        Matrix rM;
+
+        /// Matriz de traslacion del ultimo cambio.
+        Matrix tM;
+
+        public Matrix TranslationMatrix { get { return tM; } }
+
+        /// <summary>
+        /// La matriz de rotacion que se le aplico a la camara en el ultimo update de rotacion.
+        /// </summary>
+        public Matrix RotationMatrix { get { return rM; } }
+
+        /// <summary>
         /// true si la posicion cambio desde el ultimo render.
         /// </summary>
         bool positionChanged;
@@ -62,6 +77,16 @@ namespace AlumnoEjemplos.CEGA.Units
         /// true si la direccion de vista cambio desde el ultimo render.
         /// </summary>
         bool rotationChanged;
+
+        /// <summary>
+        /// true si la posicion cambio en el ultimo update.
+        /// </summary>
+        public bool PositionChanged { get { return positionChanged; } }
+
+        /// <summary>
+        /// true si la rotacion cambio desde el ultimo update.
+        /// </summary>
+        public bool RotationChanged { get { return rotationChanged; } }
 
         public float MovementSpeed { get; set; }
 
@@ -99,6 +124,8 @@ namespace AlumnoEjemplos.CEGA.Units
             rotationChanged = true;
 
             vM = Matrix.Identity;
+            rM = Matrix.Identity;
+            tM = Matrix.Identity;
 
             target  = new Vector3(0.0f, 5.0f, 1.0f);
             eye     = new Vector3(0.0f, 5.0f, 0.0f);
@@ -112,7 +139,8 @@ namespace AlumnoEjemplos.CEGA.Units
             ForwardFactor = 1.5f;
             RotationSpeed = 0.05f;
 
-            Control window = GuiController.Instance.D3dDevice.CreationParameters.FocusWindow;
+            Control window =
+                GuiController.Instance.D3dDevice.CreationParameters.FocusWindow;
 
             screenCenter = window.PointToScreen(
                 new Point(window.Width / 2, window.Height / 2));
@@ -149,23 +177,45 @@ namespace AlumnoEjemplos.CEGA.Units
             float elapsedTime = GuiController.Instance.ElapsedTime;
             TgcD3dInput input = GuiController.Instance.D3dInput;
 
+            // posicion
+            //
+            bool moved = false;
             Vector3 movement = new Vector3(0.0f, 0.0f, 0.0f);
-
+            
             if (input.keyDown(Key.W))
-                move(forward * (MovementSpeed * ForwardFactor * elapsedTime));
+            { 
+                movement += forward * (   MovementSpeed * ForwardFactor * elapsedTime);
+                moved = true;
+            }
 
             if (input.keyDown(Key.A))
-                move(xAxis * (- MovementSpeed * elapsedTime));
+            {
+                movement += xAxis   * ( - MovementSpeed *                 elapsedTime);
+                moved = true;
+            }
 
             if (input.keyDown(Key.S))
-                move(forward * (-MovementSpeed * elapsedTime));
+            {
+                movement += forward * ( - MovementSpeed *                 elapsedTime);
+                moved = true;
+            }
 
             if (input.keyDown(Key.D))
-                move(xAxis * (MovementSpeed * elapsedTime));
+            {
+                movement += xAxis   * (   MovementSpeed *                 elapsedTime);
+                moved = true;
+            }
+
+            if (moved)
+                move(movement);
+
+            // rotacion
+            //
 
             if (input.keyPressed(Key.L))
                 LockMouse = !LockMouse;
 
+            // invertidos: moverse en x cambia el heading (rotacion sobre y) y viceversa.
             float rotY = input.XposRelative * RotationSpeed;
             float rotX = input.YposRelative * RotationSpeed;
             
@@ -183,20 +233,22 @@ namespace AlumnoEjemplos.CEGA.Units
         /// <param name="rotY"></param>
         private void look(float rotX, float rotY)
         {
-            Matrix rm =
-                Matrix.RotationAxis(xAxis, rotX) *
-                Matrix.RotationAxis(up, rotY);
+            rM = Matrix.RotationAxis(xAxis, rotX) *
+                 Matrix.RotationAxis(up, rotY);
 
             Vector4 result;
             
-            result = Vector3.Transform(xAxis, rm);
+            result = Vector3.Transform(xAxis, rM);
             xAxis = new Vector3(result.X, result.Y, result.Z);
 
-            result = Vector3.Transform(yAxis, rm);
+            result = Vector3.Transform(yAxis, rM);
             yAxis = new Vector3(result.X, result.Y, result.Z);
 
-            result = Vector3.Transform(zAxis, rm);
+            result = Vector3.Transform(zAxis, rM);
             zAxis = new Vector3(result.X, result.Y, result.Z);
+
+            // recalcular las dependencias
+            //
 
             forward = Vector3.Cross(xAxis, up);
             forward.Normalize();
@@ -228,7 +280,7 @@ namespace AlumnoEjemplos.CEGA.Units
         }
 
         /// <summary>
-        /// Actualizar la matriz View en base a los valores de la cámara
+        /// Entrega la matriz de vista a D3D.
         /// </summary>
         public void updateViewMatrix(Microsoft.DirectX.Direct3D.Device d3dDevice)
         {
@@ -245,11 +297,13 @@ namespace AlumnoEjemplos.CEGA.Units
             eye    += delta;
             target += delta;
 
+            tM = Matrix.Translation(eye);
+
             positionChanged = true;
         }
 
         /// <summary>
-        /// Actualiza la matriz de vista, solo si es necesario.
+        /// Actualiza la matriz de vista, solo lo que sea necesario.
         /// </summary>
         void rebuildViewMatrix()
         {
