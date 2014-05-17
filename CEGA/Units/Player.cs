@@ -7,6 +7,7 @@ using TgcViewer.Utils.Input;
 using TgcViewer.Utils.TgcGeometry;
 using TgcViewer.Utils.TgcSceneLoader;
 using TgcViewer.Utils.Sound;
+using AlumnoEjemplos.CEGA.Units;
 
 namespace AlumnoEjemplos.CEGA
 {
@@ -51,18 +52,9 @@ namespace AlumnoEjemplos.CEGA
 
             // Configuracion de la camara
             //
-            TgcFpsCamera camera = GuiController.Instance.FpsCamera;
-
-            //Camara en primera persona, tipo videojuego FPS
-            //Solo puede haber una camara habilitada a la vez. Al habilitar la camara FPS se deshabilita la camara rotacional
-            //Por default la camara FPS viene desactivada
-            camera.Enable = true;
-            //Configurar posicion y hacia donde se mira
-            camera.setCamera(rifle.Position, new Vector3(0.0f, 0.0f, 0.0f));
-            camera.MovementSpeed = 100.0f;
-
-            //Inicializo la pos de la camara
-            posicionAnteriorCamara = camera.Position;
+            GuiController.Instance.CurrentCamera.Enable = false;
+            FpsCamera camera = new FpsCamera();
+            GuiController.Instance.CurrentCamera = camera;
 
             // hacia donde mira el rifle, sin transformaciones
             lookAtInicialDelRifle = new Vector3(0.0f, 0.0f, -1.0f);

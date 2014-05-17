@@ -1,3 +1,4 @@
+using Microsoft.DirectX;
 using Microsoft.DirectX.Direct3D;
 using System.Drawing;
 using TgcViewer;
