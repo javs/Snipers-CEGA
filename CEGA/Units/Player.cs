@@ -7,6 +7,7 @@ using TgcViewer.Utils.Input;
 using TgcViewer.Utils.TgcGeometry;
 using TgcViewer.Utils.TgcSceneLoader;
 using TgcViewer.Utils.Sound;
+using AlumnoEjemplos.CEGA.Units;
 
 namespace AlumnoEjemplos.CEGA
 {
@@ -16,8 +17,8 @@ namespace AlumnoEjemplos.CEGA
     class Player : IRenderable, IUpdatable
     {
         TgcMesh rifle;
-        Vector3 lookAtInicialDelRifle;
-        Vector3 posicionAnteriorCamara;
+        Matrix rifleBaseTransforms;
+
         Boolean scope = false;
         float zoom = 1.0f;
 
@@ -25,14 +26,21 @@ namespace AlumnoEjemplos.CEGA
         Matrix matrizConZoom = GuiController.Instance.D3dDevice.Transform.Projection;
 
         TgcStaticSound sound_Zoom;
-        TgcStaticSound sound_Walk;
 
         TgcSprite scope_stencil;
 
-        //Constantes
+        FpsCamera camera;
+
+        #region Constants
         const int zoomMaximo = 3;
         const float zoomWheel = 1.2F;
         const float zoomBase = 1.4F;
+
+        const float RUNNING_SPEED = 50.0f;
+        const float WALKING_SPEED = 25.0f;
+        const float ROTATION_SPEED_NO_SCOPE = 2.5f;
+        const float ROTATION_SPEED_SCOPE = 0.5f;
+        #endregion
 
         public Player()
         {
@@ -42,36 +50,28 @@ namespace AlumnoEjemplos.CEGA
 
             TgcScene sniperRifle = loaderSniper.loadSceneFromFile(media + "Sniper-TgcScene.xml");
 
-            // De toda la escena solo nos interesa guardarnos el primer modelo (el único que hay en este caso).
             rifle = sniperRifle.Meshes[0];
-            rifle.Position = new Vector3(125.0f, 5.0f, 125.0f);
             rifle.AlphaBlendEnable = true;
-            rifle.Scale = new Vector3(0.01f, 0.01f, 0.01f);
             rifle.AutoTransformEnable = false;
+
+            rifleBaseTransforms =
+                Matrix.Scaling(new Vector3(0.01f, 0.01f, 0.01f)) *
+                Matrix.RotationY(FastMath.PI - 0.03f) *
+                Matrix.Translation(new Vector3(0.5f, -1.0f, 2.0f));
 
             // Configuracion de la camara
             //
-            TgcFpsCamera camera = GuiController.Instance.FpsCamera;
+            GuiController.Instance.CurrentCamera.Enable = false;
+            camera = new FpsCamera();
+            GuiController.Instance.CurrentCamera = camera;
+            camera.MovementSpeed = WALKING_SPEED;
+            camera.RotationSpeed = ROTATION_SPEED_NO_SCOPE;
 
-            //Camara en primera persona, tipo videojuego FPS
-            //Solo puede haber una camara habilitada a la vez. Al habilitar la camara FPS se deshabilita la camara rotacional
-            //Por default la camara FPS viene desactivada
-            camera.Enable = true;
-            //Configurar posicion y hacia donde se mira
-            camera.setCamera(rifle.Position, new Vector3(0.0f, 0.0f, 0.0f));
-            camera.MovementSpeed = 100.0f;
-
-            //Inicializo la pos de la camara
-            posicionAnteriorCamara = camera.Position;
-
-            // hacia donde mira el rifle, sin transformaciones
-            lookAtInicialDelRifle = new Vector3(0.0f, 0.0f, -1.0f);
-            lookAtInicialDelRifle.Normalize();
-
+            // Configuracion del stencil para el modo scope
+            //
             scope_stencil = new TgcSprite();
             scope_stencil.Texture = TgcTexture.createTexture(media + @"Textures\scope_hi.png");
 
-            // Centrado en el medio de la pantalla
             Size screenSize = GuiController.Instance.Panel3d.Size;
             Size textureSize = scope_stencil.Texture.Size;
 
@@ -89,30 +89,22 @@ namespace AlumnoEjemplos.CEGA
         private void LoadSounds(string media)
         {
             sound_Zoom = new TgcStaticSound();
-            sound_Walk = new TgcStaticSound();
-
             sound_Zoom.loadSound(media + @"Sound\zoom.wav", -1000);
+
+            TgcStaticSound sound_Walk = new TgcStaticSound();
             sound_Walk.loadSound(media + @"Sound\pl_dirt1.wav", -2000);
+
+            camera.MovementSound = sound_Walk;
         }
 
         public void Update(float elapsedTime)
         {
-            TgcFpsCamera camera = GuiController.Instance.FpsCamera;
-
-            // Corremos con shift
+            // correr
             if (GuiController.Instance.D3dInput.keyPressed(Microsoft.DirectX.DirectInput.Key.LeftShift))
-                camera.MovementSpeed = 200.0f;
+                camera.MovementSpeed = RUNNING_SPEED;
             else if (GuiController.Instance.D3dInput.keyUp(Microsoft.DirectX.DirectInput.Key.LeftShift))
-                camera.MovementSpeed = 100.0f;
+                camera.MovementSpeed = WALKING_SPEED;
 
-
-            // Sonido al caminar
-
-            if (posicionAnteriorCamara.X != camera.Position.X || posicionAnteriorCamara.Z != camera.Position.Z)
-            {
-                sound_Walk.play();
-                posicionAnteriorCamara = camera.Position;
-            }
             // Activa el scope
             if (GuiController.Instance.D3dInput.buttonPressed(TgcViewer.Utils.Input.TgcD3dInput.MouseButtons.BUTTON_RIGHT))
             {
@@ -127,12 +119,12 @@ namespace AlumnoEjemplos.CEGA
                 if (scope)
                 {
                     zoom = zoomBase;
-                    camera.RotationSpeed = .4F;
+                    camera.RotationSpeed = ROTATION_SPEED_SCOPE;
                 }
                 else
                 {
                     zoom = 1;
-                    camera.RotationSpeed = 1;
+                    camera.RotationSpeed = ROTATION_SPEED_NO_SCOPE;
                 }
             }
 
@@ -167,32 +159,10 @@ namespace AlumnoEjemplos.CEGA
         /// </summary>
         private void UpdateRifle()
         {
-            TgcFpsCamera camera = GuiController.Instance.FpsCamera;
-
-            // FpsCamera traslada el vector a la posicion de la camara. Eso complica los calculos, asique aca se substrae.
-            Vector3 lookAt = camera.LookAt - camera.Position;
-
-            lookAt.Y = 0; // la posicion vertical interfiere con el calculo del angulo, eliminarla
-            lookAt.Normalize();
-
-            // al normalizarlos, evita tener que dividir por el producto de sus modulos (es 1)
-            float angle = FastMath.Acos(Vector3.Dot(lookAtInicialDelRifle, lookAt));
-
-            // compensa los cuadrantes superiores ya que el acos tiene una imagen entre 0 y pi
-            if (lookAt.X > 0.0f)
-                angle = FastMath.TWO_PI - angle;
-
-            // El orden y la separacion de las transformadas es muy importante.
-            // 1. Escalar
-            // 2. Alejar levemente del origen (efecto "en mis manos").
-            // 3. Rotarlo (al aplicar primero 2, esto logra que el rifle rote sobre el eje del jugador, y no sobre si mismo).
-            // 4. Moverlo a donde esta la camara.
             rifle.Transform =
-                Matrix.Scaling(new Vector3(0.01f, 0.01f, 0.01f)) *
-                Matrix.Translation(new Vector3(-0.5f, -1.0f, -2.0f)) *
-                Matrix.RotationYawPitchRoll(angle, 0.0f, 0.0f) *
-                Matrix.Translation(GuiController.Instance.FpsCamera.Position)
-                ;
+                rifleBaseTransforms *
+                camera.RotationMatrix *
+                camera.TranslationMatrix;
         }
 
         public void Render(Snipers scene)
@@ -216,9 +186,9 @@ namespace AlumnoEjemplos.CEGA
         public void Dispose()
         {
             rifle.dispose();
-            sound_Walk.dispose();
             sound_Zoom.dispose();
             scope_stencil.dispose();
+            camera.Dispose();
         }
     }
 }
