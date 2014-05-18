@@ -120,5 +120,10 @@ namespace AlumnoEjemplos.CEGA
             return suelo.BoundingBox;
         }
 
+        public List<TgcMesh> objetosConColision()
+        {
+            return otrosObjetos;
+        }
+
     }
 }

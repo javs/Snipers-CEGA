@@ -87,6 +87,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CEGA\Units\DetectorDeColisiones.cs" />
     <Compile Include="CEGA\Units\Enemigo.cs" />
     <Compile Include="CEGA\Units\EnemigosAdmin.cs" />
     <Compile Include="CEGA\Interfaces\IRenderable.cs" />

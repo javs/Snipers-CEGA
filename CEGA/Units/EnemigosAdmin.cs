@@ -113,7 +113,10 @@ namespace AlumnoEjemplos.CEGA
                 enemigo.Dispose();
             }
         }
-    
+
+        public List<Enemigo> listaDeEnemigos() {
+            return listaEnemigos;
+        }
     }
 
 }

@@ -88,5 +88,10 @@ namespace AlumnoEjemplos.CEGA
             enemigo.dispose();
         }
 
+        public TgcBoundingBox BoundigBox()
+        {
+            return enemigo.BoundingBox;
+        }
+
     }
 }
