@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using TgcViewer;
 using TgcViewer.Utils.Input;
+using TgcViewer.Utils.TgcGeometry;
 
 namespace AlumnoEjemplos.CEGA.Units
 {
@@ -83,6 +84,11 @@ namespace AlumnoEjemplos.CEGA.Units
         /// </summary>
         bool rotationChanged;
 
+        /// <summary>
+        /// La rotacion total sobre el eje x.
+        /// </summary>
+        float absoluteRotationX;
+
         public float MovementSpeed { get; set; }
 
         /// <summary>
@@ -90,10 +96,37 @@ namespace AlumnoEjemplos.CEGA.Units
         /// </summary>
         public float ForwardFactor { get; set; }
 
+        public float rotationSpeed;
+
         /// <summary>
-        /// Velocidad de rotacion.
+        /// Velocidad de rotacion, en grados / ( segundo * pix ).
         /// </summary>
-        public float RotationSpeed { get; set; }
+        public float RotationSpeed
+        {
+            set { rotationSpeed = FastMath.ToRad(value); }
+            get { return FastMath.ToDeg(rotationSpeed); }
+        }
+
+        float maxTopAngle;
+        float maxBottomAngle;
+
+        /// <summary>
+        /// Establece el maximo angulo de rotacion X (pitch) hacia arriba, en grados.
+        /// </summary>
+        public float MaxTopAngle
+        {
+            set { maxTopAngle = FastMath.ToRad(value); }
+            get { return FastMath.ToDeg(maxTopAngle); }
+        }
+
+        /// <summary>
+        /// Establece el maximo angulo de rotacion X (pitch) hacia abajo, en grados.
+        /// </summary>
+        public float MaxBottomAngle
+        {
+            set { maxBottomAngle = FastMath.ToRad(value); }
+            get { return FastMath.ToDeg(maxBottomAngle); }
+        }
 
         /// <summary>
         /// true si el mouse esta actualmente capturado por la camara.
@@ -140,9 +173,13 @@ namespace AlumnoEjemplos.CEGA.Units
             zAxis   = new Vector3();
             forward = new Vector3();
 
-            MovementSpeed = 25.0f;
-            ForwardFactor = 1.5f;
-            RotationSpeed = 0.05f;
+            absoluteRotationX = 0.0f;
+
+            MovementSpeed   =  25.0f;
+            ForwardFactor   =   1.5f;
+            RotationSpeed   =   3.0f;
+            MaxTopAngle     =  88.0f;
+            MaxBottomAngle  = -80.0f;
 
             Control window =
                 GuiController.Instance.D3dDevice.CreationParameters.FocusWindow;
@@ -221,8 +258,8 @@ namespace AlumnoEjemplos.CEGA.Units
                 LockMouse = !LockMouse;
 
             // invertidos: moverse en x cambia el heading (rotacion sobre y) y viceversa.
-            float rotY = input.XposRelative * RotationSpeed;
-            float rotX = input.YposRelative * RotationSpeed;
+            float rotY = input.XposRelative * rotationSpeed;
+            float rotX = input.YposRelative * rotationSpeed;
             
             if (rotY != 0.0f || rotX != 0.0f)
                 look(rotX, rotY);
@@ -238,6 +275,25 @@ namespace AlumnoEjemplos.CEGA.Units
         /// <param name="rotY"></param>
         private void look(float rotX, float rotY)
         {
+            // controlar los limites de rotacion sobre X (pitch)
+            //
+
+            absoluteRotationX += rotX;
+
+            if (absoluteRotationX > maxTopAngle)
+            {
+                rotX = maxTopAngle - (absoluteRotationX - rotX);
+                absoluteRotationX = maxTopAngle;
+            }
+            else if (absoluteRotationX < maxBottomAngle)
+            {
+                rotX = maxBottomAngle - (absoluteRotationX - rotX);
+                absoluteRotationX = maxBottomAngle;
+            }
+
+            // rotar la camara
+            //
+
             Matrix deltaRM =
                 Matrix.RotationAxis(xAxis, rotX) *
                 Matrix.RotationAxis(up, rotY);
