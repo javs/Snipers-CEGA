@@ -337,7 +337,7 @@ namespace AlumnoEjemplos.CEGA.Units
             forward = Vector3.Cross(xAxis, up);
             forward.Normalize();
 
-            target = eye + xAxis;
+            target = eye + zAxis;
 
             rotationChanged = true;
         }
