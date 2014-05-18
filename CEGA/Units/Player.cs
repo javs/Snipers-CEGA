@@ -26,16 +26,21 @@ namespace AlumnoEjemplos.CEGA
         Matrix matrizConZoom = GuiController.Instance.D3dDevice.Transform.Projection;
 
         TgcStaticSound sound_Zoom;
-        TgcStaticSound sound_Walk;
 
         TgcSprite scope_stencil;
 
         FpsCamera camera;
 
-        //Constantes
+        #region Constants
         const int zoomMaximo = 3;
         const float zoomWheel = 1.2F;
         const float zoomBase = 1.4F;
+
+        const float RUNNING_SPEED = 50.0f;
+        const float WALKING_SPEED = 25.0f;
+        const float ROTATION_SPEED_NO_SCOPE = 2.5f;
+        const float ROTATION_SPEED_SCOPE = 0.5f;
+        #endregion
 
         public Player()
         {
@@ -59,6 +64,8 @@ namespace AlumnoEjemplos.CEGA
             GuiController.Instance.CurrentCamera.Enable = false;
             camera = new FpsCamera();
             GuiController.Instance.CurrentCamera = camera;
+            camera.MovementSpeed = WALKING_SPEED;
+            camera.RotationSpeed = ROTATION_SPEED_NO_SCOPE;
 
             // Configuracion del stencil para el modo scope
             //
@@ -82,29 +89,21 @@ namespace AlumnoEjemplos.CEGA
         private void LoadSounds(string media)
         {
             sound_Zoom = new TgcStaticSound();
-            sound_Walk = new TgcStaticSound();
-
             sound_Zoom.loadSound(media + @"Sound\zoom.wav", -1000);
+
+            TgcStaticSound sound_Walk = new TgcStaticSound();
             sound_Walk.loadSound(media + @"Sound\pl_dirt1.wav", -2000);
+
+            camera.MovementSound = sound_Walk;
         }
 
         public void Update(float elapsedTime)
         {
-            // \fixme
-            // Corremos con shift
-            //if (GuiController.Instance.D3dInput.keyPressed(Microsoft.DirectX.DirectInput.Key.LeftShift))
-            //    camera.MovementSpeed = 200.0f;
-            //else if (GuiController.Instance.D3dInput.keyUp(Microsoft.DirectX.DirectInput.Key.LeftShift))
-            //    camera.MovementSpeed = 100.0f;
-
-
-            // \fixme
-            // Sonido al caminar
-            //if (posicionAnteriorCamara.X != camera.Position.X || posicionAnteriorCamara.Z != camera.Position.Z)
-            //{
-            //    sound_Walk.play();
-            //    posicionAnteriorCamara = camera.Position;
-            //}
+            // correr
+            if (GuiController.Instance.D3dInput.keyPressed(Microsoft.DirectX.DirectInput.Key.LeftShift))
+                camera.MovementSpeed = RUNNING_SPEED;
+            else if (GuiController.Instance.D3dInput.keyUp(Microsoft.DirectX.DirectInput.Key.LeftShift))
+                camera.MovementSpeed = WALKING_SPEED;
 
             // Activa el scope
             if (GuiController.Instance.D3dInput.buttonPressed(TgcViewer.Utils.Input.TgcD3dInput.MouseButtons.BUTTON_RIGHT))
@@ -120,12 +119,12 @@ namespace AlumnoEjemplos.CEGA
                 if (scope)
                 {
                     zoom = zoomBase;
-                    camera.RotationSpeed = .4F;
+                    camera.RotationSpeed = ROTATION_SPEED_SCOPE;
                 }
                 else
                 {
                     zoom = 1;
-                    camera.RotationSpeed = 1;
+                    camera.RotationSpeed = ROTATION_SPEED_NO_SCOPE;
                 }
             }
 
@@ -187,9 +186,9 @@ namespace AlumnoEjemplos.CEGA
         public void Dispose()
         {
             rifle.dispose();
-            sound_Walk.dispose();
             sound_Zoom.dispose();
             scope_stencil.dispose();
+            camera.Dispose();
         }
     }
 }

@@ -1,19 +1,24 @@
 ﻿
 using Microsoft.DirectX;
 using Microsoft.DirectX.DirectInput;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 using TgcViewer;
 using TgcViewer.Utils.Input;
+using TgcViewer.Utils.Sound;
 using TgcViewer.Utils.TgcGeometry;
 
 namespace AlumnoEjemplos.CEGA.Units
 {
     /// <summary>
     /// Controla una camara en primera persona.
+    /// Autor: JJ
     /// </summary>
-    class FpsCamera : TgcCamera
+    class FpsCamera : TgcCamera, IDisposable
     {
+        public bool Enable { get; set; }
+
         /// <summary>
         /// Hacia donde es X, desde la perspectiva de la camara.
         /// </summary>
@@ -96,7 +101,12 @@ namespace AlumnoEjemplos.CEGA.Units
         /// </summary>
         public float ForwardFactor { get; set; }
 
-        public float rotationSpeed;
+        /// <summary>
+        /// La velocidad actual de la camara.
+        /// </summary>
+        public float CurrentSpeed { get; set; }
+
+        float rotationSpeed;
 
         /// <summary>
         /// Velocidad de rotacion, en grados / ( segundo * pix ).
@@ -137,6 +147,11 @@ namespace AlumnoEjemplos.CEGA.Units
         /// Centro de la ventana actual, en coordenadas de la pantalla.
         /// </summary>
         private Point windowCenter;
+
+        /// <summary>
+        /// El sonido usado para caminar.
+        /// </summary>
+        public TgcStaticSound MovementSound { get; set; }
 
         /// <summary>
         /// Controla la captura del mouse.
@@ -180,6 +195,7 @@ namespace AlumnoEjemplos.CEGA.Units
             RotationSpeed   =   3.0f;
             MaxTopAngle     =  88.0f;
             MaxBottomAngle  = -80.0f;
+            CurrentSpeed = MovementSpeed;
 
             Control window =
                 GuiController.Instance.D3dDevice.CreationParameters.FocusWindow;
@@ -249,7 +265,11 @@ namespace AlumnoEjemplos.CEGA.Units
             }
 
             if (moved)
+            {
                 move(movement);
+
+                MovementSound.play();
+            }
 
             // rotacion
             //
@@ -398,6 +418,9 @@ namespace AlumnoEjemplos.CEGA.Units
             positionChanged = false;
         }
 
-        public bool Enable { get; set; }
+        public void Dispose()
+        {
+            MovementSound.dispose();
+        }
     }
 }
