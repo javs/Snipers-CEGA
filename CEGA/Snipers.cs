@@ -43,7 +43,7 @@ namespace AlumnoEjemplos.CEGA
         PlayScene playScene;
         Player player;
         EnemigosAdmin enemigosAdmin;
-
+        
         // Post-procesamiento
         //
         VertexBuffer vbPostProcessMesh;

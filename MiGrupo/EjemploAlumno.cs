@@ -7,18 +7,30 @@ using Microsoft.DirectX.Direct3D;
 using System.Drawing;
 using Microsoft.DirectX;
 using TgcViewer.Utils.Modifiers;
+using TgcViewer.Utils._2D;
+using TgcViewer.Utils.TgcSceneLoader;
+using TgcViewer.Utils.TgcGeometry;
 
 namespace AlumnoEjemplos.MiGrupo
 {
     /// <summary>
     /// Ejemplo del alumno
     /// </summary>
+   
+       
+    
     public class EjemploAlumno : TgcExample
     {
         /// <summary>
         /// Categoría a la que pertenece el ejemplo.
         /// Influye en donde se va a haber en el árbol de la derecha de la pantalla.
         /// </summary>
+
+        TgcSprite sprite;
+        TgcBox suelo;
+        TgcBox objetivo;
+        
+        
         public override string getCategory()
         {
             return "AlumnoEjemplos";
@@ -124,6 +136,26 @@ namespace AlumnoEjemplos.MiGrupo
             }
 
 
+            //USER SPACE
+
+            //Crear Sprite
+            sprite = new TgcSprite();
+            sprite.Texture = TgcTexture.createTexture(GuiController.Instance.ExamplesMediaDir + "\\Texturas\\Mira.png");
+
+            Size screenSize = GuiController.Instance.Panel3d.Size;
+            Size textureSize = sprite.Texture.Size;
+            sprite.Position = new Vector2(FastMath.Max(screenSize.Width / 2 - textureSize.Width / 2, 0), FastMath.Max(screenSize.Height / 2 - textureSize.Height / 2, 0));
+
+
+            //Piso y Caja objetivo
+            suelo = TgcBox.fromSize(new Vector3(130, 0, 130), new Vector3(280, 0, 280), Color.Red);
+
+            objetivo = TgcBox.fromSize(new Vector3(0, 10, 0), new Vector3(10, 10, 10), Color.Blue);
+
+            //Hacer que la camara se centre en el box3D
+            //GuiController.Instance.RotCamera.targetObject(box.BoundingBox);
+
+
         }
 
 
@@ -164,7 +196,21 @@ namespace AlumnoEjemplos.MiGrupo
                 //Boton izq apretado
             }
 
+
+            suelo.render();
+            objetivo.render();
+
+            //Iniciar dibujado de todos los Sprites de la escena (en este caso es solo uno)
+            GuiController.Instance.Drawer2D.beginDrawSprite();
+
+            //Dibujar sprite (si hubiese mas, deberian ir todos aquí)
+            sprite.render();
+
+            //Finalizar el dibujado de Sprites
+            GuiController.Instance.Drawer2D.endDrawSprite();   
+        
         }
+
 
         /// <summary>
         /// Método que se llama cuando termina la ejecución del ejemplo.

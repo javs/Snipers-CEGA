@@ -18,6 +18,7 @@ namespace AlumnoEjemplos.CEGA.Units
     {
         TgcMesh rifle;
         Matrix rifleBaseTransforms;
+        TgcSprite mira;
 
         Boolean scope = false;
         float zoom = 1.0f;
@@ -95,6 +96,12 @@ namespace AlumnoEjemplos.CEGA.Units
             LoadSounds(media);
 
             this.vidas = 5;
+
+            mira = new TgcSprite();
+            mira.Texture = TgcTexture.createTexture(GuiController.Instance.ExamplesMediaDir + "\\Texturas\\Mira.png");
+
+            Size miraSize = mira.Texture.Size;
+            mira.Position = new Vector2(FastMath.Max(screenSize.Width / 2 - miraSize.Width / 2, 0), FastMath.Max(screenSize.Height / 2 - miraSize.Height / 2, 0));
 
         }
 
@@ -222,12 +229,18 @@ namespace AlumnoEjemplos.CEGA.Units
 
         public void RenderUI(Snipers scene)
         {
+            GuiController.Instance.Drawer2D.beginDrawSprite();
             if (scope)
             {
-                GuiController.Instance.Drawer2D.beginDrawSprite();
+                
                 scope_stencil.render();
-                GuiController.Instance.Drawer2D.endDrawSprite();
+                
             }
+            else
+            {
+                mira.render();
+            }
+            GuiController.Instance.Drawer2D.endDrawSprite();
         }
 
         public void Dispose()
