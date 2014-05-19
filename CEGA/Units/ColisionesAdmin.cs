@@ -50,7 +50,8 @@ namespace AlumnoEjemplos.CEGA.Units
             return false;
         }
 
-        public bool ColisionConObjetos() {
+        public bool ColisionConObjetos() 
+        {
       
             foreach (TgcMesh obstaculo in escenario.ObjetosConColision())
             {
@@ -61,6 +62,20 @@ namespace AlumnoEjemplos.CEGA.Units
 
             return false;
 
+        }
+
+        public bool ColisionConEnemigos()
+        {
+            foreach (Enemigo enemigo in enemigos.listaDeEnemigos())
+            {
+                if (TgcCollisionUtils.testSphereAABB(jugador.BoundingSphereJugador(), enemigo.BoundingBoxEnemigo()))
+                {
+                    enemigos.Reset();
+                    return true;
+                }
+                    
+            }
+            return false;
         }
 
     }

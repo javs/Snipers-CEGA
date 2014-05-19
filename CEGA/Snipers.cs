@@ -218,6 +218,11 @@ namespace AlumnoEjemplos.CEGA
             d3dDevice.EndScene();
         }
 
+        public void GameOver()
+        {
+            GuiController.Instance.MainForm.Close();
+        }
+
         /// <summary>
         /// Método que se llama cuando termina la ejecución del ejemplo.
         /// Hacer dispose() de todos los objetos creados.

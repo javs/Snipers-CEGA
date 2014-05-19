@@ -22,9 +22,9 @@ namespace AlumnoEjemplos.CEGA.Units
 
         Vector3 limiteTerrenoInferior;
         Vector3 limiteTerrenoSuperior;
-        double spawnEnemigos = 3;
-        double velocidadSpawn = 0.05;
-        double aceleracionSpawn = 0.001;
+        double spawnEnemigos;
+        double velocidadSpawn;
+        double aceleracionSpawn;
         Random randomEnemigosAdmin = new Random();
 
         List<Enemigo> listaEnemigos = new List<Enemigo>();
@@ -34,11 +34,8 @@ namespace AlumnoEjemplos.CEGA.Units
             limiteTerrenoInferior = playScene.BoundingBoxTerreno().PMin;
             limiteTerrenoSuperior = playScene.BoundingBoxTerreno().PMax;
 
-            int i;
-            for(i = 0; i < (int)spawnEnemigos; i++)
-            {
-                this.AgregarEnemigo();
-            }
+            this.Inicializar();
+
         }
 
         private void AgregarEnemigo()
@@ -117,6 +114,24 @@ namespace AlumnoEjemplos.CEGA.Units
 
         public List<Enemigo> listaDeEnemigos() {
             return listaEnemigos;
+        }
+
+        public void Inicializar()
+        {
+            spawnEnemigos = 3;
+            velocidadSpawn = 0.05;
+            aceleracionSpawn = 0.001;
+            int i;
+            for (i = 0; i < (int)spawnEnemigos; i++)
+            {
+                this.AgregarEnemigo();
+            }
+        }
+
+        public void Reset()
+        {
+            listaEnemigos.Clear();
+            this.Inicializar();
         }
     }
 

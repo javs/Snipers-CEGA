@@ -32,6 +32,10 @@ namespace AlumnoEjemplos.CEGA.Units
         FpsCamera camera;
 
         Vector3 posicionSegura;
+        Vector3 posicionInicial;
+        Vector3 lookAtInicial;
+
+        public int vidas { get; set; }
 
         #region Constants
         const int zoomMaximo = 3;
@@ -69,6 +73,8 @@ namespace AlumnoEjemplos.CEGA.Units
             camera.MovementSpeed = WALKING_SPEED;
             camera.RotationSpeed = ROTATION_SPEED_NO_SCOPE;
             posicionSegura = camera.getPosition();
+            posicionInicial = camera.getPosition();
+            lookAtInicial = camera.getLookAt();
 
             // Configuracion del stencil para el modo scope
             //
@@ -87,6 +93,8 @@ namespace AlumnoEjemplos.CEGA.Units
                 FastMath.Max(screenSize.Height / 2 - textureSize.Height * scope_stencil.Scaling.Y / 2, 0));
 
             LoadSounds(media);
+
+            this.vidas = 5;
 
         }
 
@@ -120,6 +128,13 @@ namespace AlumnoEjemplos.CEGA.Units
                     camera.setCamera(posicionSegura, camera.getLookAt());
                 else
                     posicionSegura = camera.getPosition();
+            }
+
+            if ( ColisionesAdmin.Instance.ColisionConEnemigos() )
+            {
+                this.vidas -= 1;
+                GuiController.Instance.Logger.log("vidas: " + this.vidas);
+                camera.setCamera(posicionInicial, lookAtInicial);
             }
 
             // Disparo
@@ -196,10 +211,12 @@ namespace AlumnoEjemplos.CEGA.Units
 
         public void Render(Snipers scene)
         {
+            if (this.vidas == 0)
+                scene.GameOver();
+
             if (!scope)
                 rifle.render();
 
-            this.BoundingSphereJugador().render();
             scene.PostProcessing.LensDistortion = scope;
         }
 
