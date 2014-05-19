@@ -5,6 +5,8 @@ using TgcViewer;
 using TgcViewer.Example;
 using TgcViewer.Utils;
 using TgcViewer.Utils.Shaders;
+using AlumnoEjemplos.CEGA.Units;
+using AlumnoEjemplos.CEGA.Scenes;
 
 namespace AlumnoEjemplos.CEGA
 {
@@ -72,6 +74,10 @@ namespace AlumnoEjemplos.CEGA
             enemigosAdmin = new EnemigosAdmin(playScene);
 
             PostProcessing = new PostProcessEffects();
+
+            ColisionesAdmin.Instance.jugador = player;
+            ColisionesAdmin.Instance.escenario = playScene;
+            ColisionesAdmin.Instance.enemigos = enemigosAdmin;
 
             SetupPostProcessing();
         }

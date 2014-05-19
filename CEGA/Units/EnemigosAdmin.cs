@@ -9,9 +9,10 @@ using TgcViewer.Utils.Input;
 using TgcViewer.Utils.TgcGeometry;
 using TgcViewer.Utils.TgcSceneLoader;
 using TgcViewer.Utils.TgcSkeletalAnimation;
+using AlumnoEjemplos.CEGA.Interfaces;
+using AlumnoEjemplos.CEGA.Scenes;
 
-
-namespace AlumnoEjemplos.CEGA
+namespace AlumnoEjemplos.CEGA.Units
 {
     /// <summary>
     /// Representa al administrador de enemigos.
@@ -30,8 +31,8 @@ namespace AlumnoEjemplos.CEGA
 
         public EnemigosAdmin(PlayScene playScene)
         {
-            limiteTerrenoInferior = playScene.limitesTerreno().PMin;
-            limiteTerrenoSuperior = playScene.limitesTerreno().PMax;
+            limiteTerrenoInferior = playScene.BoundingBoxTerreno().PMin;
+            limiteTerrenoSuperior = playScene.BoundingBoxTerreno().PMax;
 
             int i;
             for(i = 0; i < (int)spawnEnemigos; i++)

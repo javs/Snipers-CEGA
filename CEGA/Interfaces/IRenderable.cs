@@ -1,7 +1,7 @@
 ﻿using System;
 using TgcViewer.Example;
 
-namespace AlumnoEjemplos.CEGA
+namespace AlumnoEjemplos.CEGA.Interfaces
 {
     interface IRenderable : IDisposable
     {

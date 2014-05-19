@@ -5,8 +5,9 @@ using TgcViewer;
 using TgcViewer.Utils.TgcGeometry;
 using TgcViewer.Utils.TgcSceneLoader;
 using TgcViewer.Utils.Terrain;
+using AlumnoEjemplos.CEGA.Interfaces;
 
-namespace AlumnoEjemplos.CEGA
+namespace AlumnoEjemplos.CEGA.Scenes
 {
     /// <summary>
     /// Representa el escenario donde se juega, con terreno y objetos inanimados
@@ -115,12 +116,12 @@ namespace AlumnoEjemplos.CEGA
                 mesh.dispose();
             }
         }
-        public TgcBoundingBox limitesTerreno()
+        public TgcBoundingBox BoundingBoxTerreno()
         {
             return suelo.BoundingBox;
         }
 
-        public List<TgcMesh> objetosConColision()
+        public List<TgcMesh> ObjetosConColision()
         {
             return otrosObjetos;
         }

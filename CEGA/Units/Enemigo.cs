@@ -9,8 +9,9 @@ using TgcViewer.Utils.Input;
 using TgcViewer.Utils.TgcGeometry;
 using TgcViewer.Utils.TgcSceneLoader;
 using TgcViewer.Utils.TgcSkeletalAnimation;
+using AlumnoEjemplos.CEGA.Interfaces;
 
-namespace AlumnoEjemplos.CEGA
+namespace AlumnoEjemplos.CEGA.Units
 {
 
     /// <summary>
@@ -83,12 +84,17 @@ namespace AlumnoEjemplos.CEGA
         {
         }
 
+        public void Morir()
+        {
+            enemigo.dispose();
+        }
+
         public void Dispose()
         {
             enemigo.dispose();
         }
 
-        public TgcBoundingBox BoundigBox()
+        public TgcBoundingBox BoundingBoxEnemigo()
         {
             return enemigo.BoundingBox;
         }

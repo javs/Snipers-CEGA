@@ -7,9 +7,9 @@ using TgcViewer.Utils.Input;
 using TgcViewer.Utils.TgcGeometry;
 using TgcViewer.Utils.TgcSceneLoader;
 using TgcViewer.Utils.Sound;
-using AlumnoEjemplos.CEGA.Units;
+using AlumnoEjemplos.CEGA.Interfaces;
 
-namespace AlumnoEjemplos.CEGA
+namespace AlumnoEjemplos.CEGA.Units
 {
     /// <summary>
     /// Representa al jugador. Tiene control de la camara.
@@ -68,6 +68,7 @@ namespace AlumnoEjemplos.CEGA
             GuiController.Instance.CurrentCamera = camera;
             camera.MovementSpeed = WALKING_SPEED;
             camera.RotationSpeed = ROTATION_SPEED_NO_SCOPE;
+            posicionSegura = camera.getPosition();
 
             // Configuracion del stencil para el modo scope
             //
@@ -87,7 +88,6 @@ namespace AlumnoEjemplos.CEGA
 
             LoadSounds(media);
 
-            GuiController.Instance.UserVars.addVar("Hay Colision");
         }
 
         private void LoadSounds(string media)
@@ -112,31 +112,23 @@ namespace AlumnoEjemplos.CEGA
             /*Si se movio, chequeo colisiones con objetos... Esto no funciona como debería, aparte no podemos atajar el movimiento antes de renderearlo y queda medio feo.
              * para solucionarlo tendríamos que hacer que la camara sigua al mesh (es decir, que el mesh sea el que se mueve con WASD) y ahí podemos atajar la colision antes
              * El otro problema es como se genera el bounding box del mesh, deje seteado para que se renderize el mesh del sniper así lo ven, solucionar esto CREO que es facil
+            */
 
             if (!posicionSegura.Equals(camera.getPosition()))
             {
-                if (DetectorDeColisiones.Instance.ColisionConObjetos())
-                {
+                if (ColisionesAdmin.Instance.ColisionConObjetos())
                     camera.setCamera(posicionSegura, camera.getLookAt());
-                    GuiController.Instance.UserVars.setValue("Hay Colision", 1);
-                }
                 else
                     posicionSegura = camera.getPosition();
-            }*/
-
-            
+            }
 
             // Disparo
             if (GuiController.Instance.D3dInput.buttonPressed(TgcViewer.Utils.Input.TgcD3dInput.MouseButtons.BUTTON_LEFT))
             {
                 TgcRay disparo = new TgcRay(camera.getPosition(), Vector3.Subtract(camera.getLookAt(),camera.getPosition()));
-                if (DetectorDeColisiones.Instance.ColisionDisparo(disparo))
-                    GuiController.Instance.UserVars.setValue("Hay Colision", 1);
+                ColisionesAdmin.Instance.ColisionDisparo(disparo);
             }
 
-            if (GuiController.Instance.D3dInput.keyPressed(Microsoft.DirectX.DirectInput.Key.F)) {
-                GuiController.Instance.UserVars.setValue("Hay Colision", 0);
-            }
             // Activa el scope
             if (GuiController.Instance.D3dInput.buttonPressed(TgcViewer.Utils.Input.TgcD3dInput.MouseButtons.BUTTON_RIGHT))
             {
@@ -207,7 +199,7 @@ namespace AlumnoEjemplos.CEGA
             if (!scope)
                 rifle.render();
 
-            rifle.BoundingBox.render();
+            this.BoundingSphereJugador().render();
             scene.PostProcessing.LensDistortion = scope;
         }
 
@@ -229,8 +221,13 @@ namespace AlumnoEjemplos.CEGA
             camera.Dispose();
         }
 
-        public TgcBoundingBox boundingBoxJugador() {
+        public TgcBoundingBox BoundingBoxJugador() {
             return rifle.BoundingBox;
+        }
+
+        public TgcBoundingSphere BoundingSphereJugador()
+        {
+            return (new TgcBoundingSphere(camera.getPosition(), (float)1));
         }
     }
 }
