@@ -21,12 +21,17 @@ namespace AlumnoEjemplos.CEGA.Units
         TgcSprite mira;
 
         Boolean scope = false;
+        Boolean puedeDisparar = true;
+
         float zoom = 1.0f;
+        float elapsedROF;
 
         Matrix matrizSinZoom = GuiController.Instance.D3dDevice.Transform.Projection;
         Matrix matrizConZoom = GuiController.Instance.D3dDevice.Transform.Projection;
 
         TgcStaticSound sound_Zoom;
+        TgcStaticSound sound_Disparo;
+        TgcStaticSound sound_DryFire;
 
         TgcSprite scope_stencil;
 
@@ -37,6 +42,7 @@ namespace AlumnoEjemplos.CEGA.Units
         Vector3 lookAtInicial;
 
         public int vidas { get; set; }
+        public int ammo { get; set; }
 
         #region Constants
         const int zoomMaximo = 3;
@@ -47,6 +53,8 @@ namespace AlumnoEjemplos.CEGA.Units
         const float WALKING_SPEED = 25.0f;
         const float ROTATION_SPEED_NO_SCOPE = 2.5f;
         const float ROTATION_SPEED_SCOPE = 0.5f;
+        const float ROF = 2.0F;
+
         #endregion
 
         public Player()
@@ -95,7 +103,10 @@ namespace AlumnoEjemplos.CEGA.Units
 
             LoadSounds(media);
 
+            //Inicializo vidas y balas
+
             this.vidas = 5;
+            this.ammo = -1; //Por ahora son infinitas
 
             mira = new TgcSprite();
             mira.Texture = TgcTexture.createTexture(GuiController.Instance.ExamplesMediaDir + "\\Texturas\\Mira.png");
@@ -113,9 +124,15 @@ namespace AlumnoEjemplos.CEGA.Units
             TgcStaticSound sound_Walk = new TgcStaticSound();
             sound_Walk.loadSound(media + @"Sound\pl_dirt1.wav", -2000);
 
+            sound_Disparo = new TgcStaticSound();
+            sound_Disparo.loadSound(media + @"Sound\disparo.wav", -1000);
+
+            sound_DryFire = new TgcStaticSound();
+            sound_DryFire.loadSound(media + @"Sound\dryfire.wav", -1000);
+
             camera.MovementSound = sound_Walk;
         }
-
+        
         public void Update(float elapsedTime)
         {
             // correr
@@ -145,11 +162,30 @@ namespace AlumnoEjemplos.CEGA.Units
             }
 
             // Disparo
+
+            if (!puedeDisparar)
+                elapsedROF += elapsedTime;
+            if (elapsedROF >= ROF)
+                puedeDisparar = true;
+
             if (GuiController.Instance.D3dInput.buttonPressed(TgcViewer.Utils.Input.TgcD3dInput.MouseButtons.BUTTON_LEFT))
             {
-                TgcRay disparo = new TgcRay(camera.getPosition(), Vector3.Subtract(camera.getLookAt(),camera.getPosition()));
-                ColisionesAdmin.Instance.ColisionDisparo(disparo);
+                if (ammo != 0)
+                {
+                    if (puedeDisparar)
+                    {
+                        TgcRay disparo = new TgcRay(camera.getPosition(), Vector3.Subtract(camera.getLookAt(), camera.getPosition()));
+                        ColisionesAdmin.Instance.ColisionDisparo(disparo);
+                        sound_Disparo.play();
+                        puedeDisparar = false;
+                        elapsedROF = 0;
+                        ammo--;
+                    }
+                }
+                else
+                    sound_DryFire.play();
             }
+     
 
             // Activa el scope
             if (GuiController.Instance.D3dInput.buttonPressed(TgcViewer.Utils.Input.TgcD3dInput.MouseButtons.BUTTON_RIGHT))
