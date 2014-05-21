@@ -48,8 +48,7 @@ namespace AlumnoEjemplos.CEGA.Units
 
         public int vidas { get; set; }
         public int ammo { get; set; }
-
-        int hits;
+        public int puntos {get; set;}
 
         TgcText2d tvidas;
         TgcText2d tammo;
@@ -114,11 +113,11 @@ namespace AlumnoEjemplos.CEGA.Units
 
             LoadSounds(media);
 
-            //Inicializo vidas , balas y hits.
+            //Inicializo vidas , balas y puntos.
 
             this.vidas = 5;
             this.ammo = -1; //Por ahora son infinitas
-            this.hits = 0;
+            this.puntos = 0;
 
             //Configuracion de la mira sin scope.
             mira = new TgcSprite();
@@ -230,7 +229,7 @@ namespace AlumnoEjemplos.CEGA.Units
                         if (ColisionesAdmin.Instance.ColisionDisparo(disparo))
                         {
                                 sound_Hit.play();
-                                hits++;
+                                
                         }
                             
 
@@ -325,7 +324,7 @@ namespace AlumnoEjemplos.CEGA.Units
             }
             tammo.render();
 
-            tpuntos.Text = "PUNTOS: " + (this.hits * 100).ToString();
+            tpuntos.Text = "PUNTOS: " + (this.puntos * 100).ToString();
             tpuntos.render();
 
         }

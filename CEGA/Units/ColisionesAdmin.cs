@@ -53,8 +53,10 @@ namespace AlumnoEjemplos.CEGA.Units
                     {
                         enemigo.Morir();
                         enemigos.listaDeEnemigos().RemoveAt(i);
+                        this.jugador.puntos += 10;
                     }
 
+                    this.jugador.puntos += 1;
                     return true;
                 }
 
@@ -66,8 +68,9 @@ namespace AlumnoEjemplos.CEGA.Units
                     {
                         enemigo.Morir();
                         enemigos.listaDeEnemigos().RemoveAt(i);
+                        this.jugador.puntos += 10;
                     }
-
+                    this.jugador.puntos += 2;
                     return true;
                 }
                 i++;
