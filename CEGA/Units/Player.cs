@@ -113,10 +113,12 @@ namespace AlumnoEjemplos.CEGA.Units
             this.ammo = -1; //Por ahora son infinitas
 
             mira = new TgcSprite();
-            mira.Texture = TgcTexture.createTexture(GuiController.Instance.ExamplesMediaDir + "\\Texturas\\Mira.png");
+            mira.Texture = TgcTexture.createTexture(GuiController.Instance.AlumnoEjemplosMediaDir + "\\Textures\\Mira.png");
 
             Size miraSize = mira.Texture.Size;
             mira.Position = new Vector2(FastMath.Max(screenSize.Width / 2 - miraSize.Width / 2, 0), FastMath.Max(screenSize.Height / 2 - miraSize.Height / 2, 0));
+
+            
 
         }
 

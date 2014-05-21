@@ -98,6 +98,8 @@ namespace AlumnoEjemplos.CEGA.Scenes
             foreach (var mesh in otrosObjetos)
             {
                 mesh.render();
+                if ((bool)GuiController.Instance.Modifiers.getValue("showBB"))
+                    mesh.BoundingBox.render();
             }
         }
 
