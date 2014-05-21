@@ -67,7 +67,7 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
                     //Modifico el BB del arbol para que sea solo el tronco
                     instance.AutoUpdateBoundingBox = false;
-                    instance.BoundingBox.scaleTranslate(instance.Position, new Vector3(0.07f, 0.1f, 0.07f));
+                    instance.BoundingBox.scaleTranslate(instance.Position, new Vector3(0.02f, 0.1f, 0.02f));
 
                     otrosObjetos.Add(instance);
                 }
