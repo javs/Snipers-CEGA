@@ -65,6 +65,10 @@ namespace AlumnoEjemplos.CEGA.Scenes
                     instance.AlphaBlendEnable = true;
                     instance.Scale = new Vector3(0.25f, 0.25f, 0.25f);
 
+                    //Modifico el BB del arbol para que sea solo el tronco
+                    instance.AutoUpdateBoundingBox = false;
+                    instance.BoundingBox.scaleTranslate(instance.Position, new Vector3(0.07f, 0.1f, 0.07f));
+
                     otrosObjetos.Add(instance);
                 }
             }

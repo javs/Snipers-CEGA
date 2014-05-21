@@ -4,6 +4,7 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 using TgcViewer;
+using TgcViewer.Utils.TgcSceneLoader;
 using TgcViewer.Utils.Input;
 using TgcViewer.Utils.Sound;
 using TgcViewer.Utils.TgcGeometry;
@@ -379,7 +380,7 @@ namespace AlumnoEjemplos.CEGA.Units
             d3dDevice.Transform.View = vM;
         }
 
-        void move(Vector3 delta)
+       public void move(Vector3 delta)
         {
             eye    += delta;
             target += delta;
@@ -405,6 +406,9 @@ namespace AlumnoEjemplos.CEGA.Units
             vM.M11 = xAxis.X;   vM.M12 = yAxis.X;   vM.M13 = zAxis.X; // (1,4) = 0
             vM.M21 = xAxis.Y;   vM.M22 = yAxis.Y;   vM.M23 = zAxis.Y; // (2,4) = 0
             vM.M31 = xAxis.Z;   vM.M32 = yAxis.Z;   vM.M33 = zAxis.Z; // (3,4) = 0
+
+
+
 
             rotationChanged = false;
 

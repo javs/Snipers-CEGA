@@ -199,7 +199,7 @@ namespace AlumnoEjemplos.CEGA.Units
             if (!posicionSegura.Equals(camera.getPosition()))
             {
                 if (ColisionesAdmin.Instance.ColisionConObjetos())
-                    camera.setCamera(posicionSegura, camera.getLookAt());
+                    camera.move(posicionSegura - camera.getPosition());
                 else
                     posicionSegura = camera.getPosition();
             }
@@ -208,7 +208,7 @@ namespace AlumnoEjemplos.CEGA.Units
             {
                 this.vidas -= 1;
                 GuiController.Instance.Logger.log("vidas: " + this.vidas);
-                camera.setCamera(posicionInicial, lookAtInicial);
+                camera.move(posicionInicial - camera.getPosition());
             }
 
             // Disparo
