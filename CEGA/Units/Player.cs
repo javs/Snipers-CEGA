@@ -36,6 +36,7 @@ namespace AlumnoEjemplos.CEGA.Units
         TgcStaticSound sound_Hit;
         //Podriamos hace que dependa de la respuesta del admin de colisiones para saber si fue headshot o un hit normal y reproducir sonidos distintos según cada cosa
         //Aparte, este sonido tendría que ser dinamico, casí ni escucharse si el enemigo esta lejos -Alex
+        //Eso lo podriamos arreglar bien para los puntos, en vez de un bool podria devolver un int que indique si fue headshot, normal, muerte o no hit.
 
         TgcSprite scope_stencil;
 
@@ -48,8 +49,11 @@ namespace AlumnoEjemplos.CEGA.Units
         public int vidas { get; set; }
         public int ammo { get; set; }
 
+        int hits;
+
         TgcText2d tvidas;
         TgcText2d tammo;
+        TgcText2d tpuntos;
 
         #region Constants
         const int zoomMaximo = 3;
@@ -110,10 +114,11 @@ namespace AlumnoEjemplos.CEGA.Units
 
             LoadSounds(media);
 
-            //Inicializo vidas y balas
+            //Inicializo vidas , balas y hits.
 
             this.vidas = 5;
             this.ammo = -1; //Por ahora son infinitas
+            this.hits = 0;
 
             //Configuracion de la mira sin scope.
             mira = new TgcSprite();
@@ -151,7 +156,7 @@ namespace AlumnoEjemplos.CEGA.Units
         {
             //Texto Vidas (TODO: Agregar Sprites de corazones o algo asi)
             tvidas = new TgcText2d();
-            tvidas.Color = Color.Cyan;
+            tvidas.Color = Color.Crimson;
             tvidas.Align = TgcText2d.TextAlign.LEFT;
             tvidas.Position = new Point(screenSize.Width - 250, screenSize.Height - 80);
             tvidas.Size = new Size(300, 100);
@@ -159,11 +164,22 @@ namespace AlumnoEjemplos.CEGA.Units
 
              //Texto Ammo (Lo mismo pero con balas)
             tammo = new TgcText2d();
-            tammo.Color = Color.Crimson;
+            tammo.Color = Color.CornflowerBlue;
             tammo.Align = TgcText2d.TextAlign.LEFT;
             tammo.Position = new Point(screenSize.Width - 500, screenSize.Height - 80);
             tammo.Size = new Size(300, 100);
             tammo.changeFont(new System.Drawing.Font("TimesNewRoman", 22, FontStyle.Bold));
+
+            //Texto Puntos (Ver bien como hacer para diferenciar muerte, headshot y cuerpo)
+            tpuntos = new TgcText2d();
+            tpuntos.Color = Color.Olive;
+            tpuntos.Align = TgcText2d.TextAlign.LEFT;
+            tpuntos.Position = new Point(screenSize.Width - 250, 0);
+            tpuntos.Size = new Size(300, 100);
+            tpuntos.changeFont(new System.Drawing.Font("TimesNewRoman", 22, FontStyle.Bold));
+
+
+
         }
 
 
@@ -212,7 +228,11 @@ namespace AlumnoEjemplos.CEGA.Units
                         TgcRay disparo = new TgcRay(camera.getPosition(), Vector3.Subtract(camera.getLookAt(), camera.getPosition()));
 
                         if (ColisionesAdmin.Instance.ColisionDisparo(disparo))
-                            sound_Hit.play();
+                        {
+                                sound_Hit.play();
+                                hits++;
+                        }
+                            
 
                         sound_Disparo.play();
                         puedeDisparar = false;
@@ -304,6 +324,10 @@ namespace AlumnoEjemplos.CEGA.Units
                 tammo.Text = "AMMO = INF"; 
             }
             tammo.render();
+
+            tpuntos.Text = "PUNTOS: " + (this.hits * 100).ToString();
+            tpuntos.render();
+
         }
 
         public void Render(Snipers scene)
@@ -345,6 +369,9 @@ namespace AlumnoEjemplos.CEGA.Units
             sound_Disparo.dispose();
             sound_DryFire.dispose();
             sound_Hit.dispose();
+            mira.dispose();
+            tvidas.dispose();
+            tammo.dispose();
         }
 
         public TgcBoundingBox BoundingBoxJugador() {
