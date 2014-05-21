@@ -19,6 +19,11 @@ namespace AlumnoEjemplos.CEGA.Units
         public EnemigosAdmin enemigos {get;set;}
         public PlayScene escenario {get;set;}
 
+        #region Constants
+        const float damage_Body = 50;
+        const float damage_Head = 100;
+        #endregion
+
         private static ColisionesAdmin instance;
 
         public static ColisionesAdmin Instance
@@ -35,13 +40,34 @@ namespace AlumnoEjemplos.CEGA.Units
         {
             Vector3 interseccion;
             int i = 0;
+            float distancia;
 
             foreach (Enemigo enemigo in enemigos.listaDeEnemigos())
             {
+                
                 if (TgcCollisionUtils.intersectRayAABB(disparo, enemigo.BoundingBoxEnemigo(), out interseccion))
                 {
-                    enemigo.Morir();
-                    enemigos.listaDeEnemigos().RemoveAt(i);
+                    enemigo.Herir(damage_Body);
+
+                    if (enemigo.Murio())
+                    {
+                        enemigo.Morir();
+                        enemigos.listaDeEnemigos().RemoveAt(i);
+                    }
+
+                    return true;
+                }
+
+                if (TgcCollisionUtils.intersectRaySphere(disparo,enemigo.BoundingBoxCabeza(), out distancia, out interseccion))
+                {
+                    enemigo.Herir(damage_Head);
+
+                    if (enemigo.Murio())
+                    {
+                        enemigo.Morir();
+                        enemigos.listaDeEnemigos().RemoveAt(i);
+                    }
+
                     return true;
                 }
                 i++;

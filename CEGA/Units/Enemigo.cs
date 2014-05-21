@@ -22,12 +22,15 @@ namespace AlumnoEjemplos.CEGA.Units
         TgcSkeletalMesh enemigo;
         List<string> meshEnemigos = new List<string>();
         Random randomEnemigo = new Random();
+        TgcBoundingSphere cabeza;
+        float hp;
         
         public Enemigo(Vector3 posicion) 
         {
             //Cargar enemigo
             TgcSkeletalLoader skeletalLoader = new TgcSkeletalLoader();
 
+          
             meshEnemigos.Add("BasicHuman-TgcSkeletalMesh.xml");
             meshEnemigos.Add("CombineSoldier-TgcSkeletalMesh.xml");
             meshEnemigos.Add("CS_Gign-TgcSkeletalMesh.xml");
@@ -48,12 +51,24 @@ namespace AlumnoEjemplos.CEGA.Units
             enemigo.playAnimation("Run", true);
             enemigo.Position = posicion;
             enemigo.Scale = new Vector3(0.12f, 0.12f, 0.12f);
+        
+            //Inicializo HP
+            hp = 100;
+
+            //Creo el BB para la cabeza
+            cabeza = new TgcBoundingSphere(new Vector3(enemigo.Position.X,enemigo.Position.Y + 5.2F,enemigo.Position.Z), 0.5F); //Debe haber alguna forma de sacar esta info del hueso directamente
+            cabeza.setRenderColor(System.Drawing.Color.Red);
+
+            //Modifico el BB del cuerpo
+            enemigo.AutoUpdateBoundingBox = false;
+            enemigo.BoundingBox.scaleTranslate(enemigo.Position, new Vector3(0.07f, 0.095f, 0.07f));
             
         }
 
         public void Update(float elapsedTime)
         {
             int velocidadEnemigo = randomEnemigo.Next(10, 15);
+
             Vector3 posicionPlayer = GuiController.Instance.CurrentCamera.getPosition();
 
             // vector con direccion al jugador
@@ -73,15 +88,32 @@ namespace AlumnoEjemplos.CEGA.Units
 
             enemigo.updateAnimation();
 
+            cabeza.moveCenter(direccionPlayer * velocidadEnemigo * elapsedTime);
+            enemigo.BoundingBox.move(direccionPlayer * velocidadEnemigo * elapsedTime);
         }
 
         public void Render(Snipers scene)
         {
             enemigo.render();
+
+            if ((bool)GuiController.Instance.Modifiers.getValue("showBB"))
+            {
+                enemigo.BoundingBox.render();
+                cabeza.render();
+            }
         }
 
         public void RenderUI(Snipers scene)
         {
+        }
+
+        public void Herir(float hpARestar) {
+            hp -= hpARestar;
+        }
+
+        public bool Murio()
+        {
+            return (hp <= 0);
         }
 
         public void Morir()
@@ -92,11 +124,17 @@ namespace AlumnoEjemplos.CEGA.Units
         public void Dispose()
         {
             enemigo.dispose();
+            cabeza.dispose();
         }
 
         public TgcBoundingBox BoundingBoxEnemigo()
         {
             return enemigo.BoundingBox;
+        }
+
+        public TgcBoundingSphere BoundingBoxCabeza()
+        {
+            return cabeza;
         }
 
     }

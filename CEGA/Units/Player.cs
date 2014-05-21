@@ -32,6 +32,7 @@ namespace AlumnoEjemplos.CEGA.Units
         TgcStaticSound sound_Zoom;
         TgcStaticSound sound_Disparo;
         TgcStaticSound sound_DryFire;
+        TgcStaticSound sound_Hit; //Podriamos hace que dependa de la respuesta del admin de colisiones para saber si fue headshot o un hit normal y reproducir sonidos distintos según cada cosa
 
         TgcSprite scope_stencil;
 
@@ -130,6 +131,9 @@ namespace AlumnoEjemplos.CEGA.Units
             sound_DryFire = new TgcStaticSound();
             sound_DryFire.loadSound(media + @"Sound\dryfire.wav", -1000);
 
+            sound_Hit = new TgcStaticSound();
+            sound_Hit.loadSound(media + @"Sound\hit.wav", -500);
+
             camera.MovementSound = sound_Walk;
         }
         
@@ -175,7 +179,10 @@ namespace AlumnoEjemplos.CEGA.Units
                     if (puedeDisparar)
                     {
                         TgcRay disparo = new TgcRay(camera.getPosition(), Vector3.Subtract(camera.getLookAt(), camera.getPosition()));
-                        ColisionesAdmin.Instance.ColisionDisparo(disparo);
+
+                        if (ColisionesAdmin.Instance.ColisionDisparo(disparo))
+                            sound_Hit.play();
+
                         sound_Disparo.play();
                         puedeDisparar = false;
                         elapsedROF = 0;
@@ -285,6 +292,9 @@ namespace AlumnoEjemplos.CEGA.Units
             sound_Zoom.dispose();
             scope_stencil.dispose();
             camera.Dispose();
+            sound_Disparo.dispose();
+            sound_DryFire.dispose();
+            sound_Hit.dispose();
         }
 
         public TgcBoundingBox BoundingBoxJugador() {
