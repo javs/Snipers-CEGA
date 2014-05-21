@@ -29,6 +29,8 @@ namespace AlumnoEjemplos.MiGrupo
         TgcSprite sprite;
         TgcBox suelo;
         TgcBox objetivo;
+        TgcText2d text2;
+        int vidas = 5;
         
         
         public override string getCategory()
@@ -156,7 +158,15 @@ namespace AlumnoEjemplos.MiGrupo
             //GuiController.Instance.RotCamera.targetObject(box.BoundingBox);
 
 
-        }
+            //Crear texto 2, especificando color, alineación, posición, tamaño y fuente.
+            text2 = new TgcText2d();
+            text2.Text = "VIDAS = " + vidas.ToString();
+            text2.Align = TgcText2d.TextAlign.RIGHT;
+            text2.Position = new Point(screenSize.Width - 380, screenSize.Height -  80);
+            text2.Size = new Size(300, 100);
+            text2.Color = Color.Cyan;
+            text2.changeFont(new System.Drawing.Font("TimesNewRoman", 25, FontStyle.Bold));
+             }
 
 
         /// <summary>
@@ -193,6 +203,9 @@ namespace AlumnoEjemplos.MiGrupo
             //Capturar Input Mouse
             if (GuiController.Instance.D3dInput.buttonPressed(TgcViewer.Utils.Input.TgcD3dInput.MouseButtons.BUTTON_LEFT))
             {
+                vidas--;
+                text2.Text = "VIDAS = " + vidas.ToString();
+                
                 //Boton izq apretado
             }
 
@@ -207,7 +220,9 @@ namespace AlumnoEjemplos.MiGrupo
             sprite.render();
 
             //Finalizar el dibujado de Sprites
-            GuiController.Instance.Drawer2D.endDrawSprite();   
+            GuiController.Instance.Drawer2D.endDrawSprite();
+
+            text2.render();
         
         }
 

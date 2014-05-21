@@ -48,6 +48,9 @@ namespace AlumnoEjemplos.CEGA.Units
         public int vidas { get; set; }
         public int ammo { get; set; }
 
+        TgcText2d tvidas;
+        TgcText2d tammo;
+
         #region Constants
         const int zoomMaximo = 3;
         const float zoomWheel = 1.2F;
@@ -112,13 +115,15 @@ namespace AlumnoEjemplos.CEGA.Units
             this.vidas = 5;
             this.ammo = -1; //Por ahora son infinitas
 
+            //Configuracion de la mira sin scope.
             mira = new TgcSprite();
             mira.Texture = TgcTexture.createTexture(GuiController.Instance.AlumnoEjemplosMediaDir + "\\Textures\\Mira.png");
 
             Size miraSize = mira.Texture.Size;
             mira.Position = new Vector2(FastMath.Max(screenSize.Width / 2 - miraSize.Width / 2, 0), FastMath.Max(screenSize.Height / 2 - miraSize.Height / 2, 0));
 
-            
+            //Inicialización UI (Texto)
+            LoadUI(screenSize);
 
         }
 
@@ -142,6 +147,27 @@ namespace AlumnoEjemplos.CEGA.Units
             camera.MovementSound = sound_Walk;
         }
         
+         private void LoadUI(Size screenSize)
+        {
+            //Texto Vidas (TODO: Agregar Sprites de corazones o algo asi)
+            tvidas = new TgcText2d();
+            tvidas.Color = Color.Cyan;
+            tvidas.Align = TgcText2d.TextAlign.LEFT;
+            tvidas.Position = new Point(screenSize.Width - 250, screenSize.Height - 80);
+            tvidas.Size = new Size(300, 100);
+            tvidas.changeFont(new System.Drawing.Font("TimesNewRoman", 22, FontStyle.Bold));
+
+             //Texto Ammo (Lo mismo pero con balas)
+            tammo = new TgcText2d();
+            tammo.Color = Color.Crimson;
+            tammo.Align = TgcText2d.TextAlign.LEFT;
+            tammo.Position = new Point(screenSize.Width - 500, screenSize.Height - 80);
+            tammo.Size = new Size(300, 100);
+            tammo.changeFont(new System.Drawing.Font("TimesNewRoman", 22, FontStyle.Bold));
+        }
+
+
+
         public void Update(float elapsedTime)
         {
             // correr
@@ -264,6 +290,22 @@ namespace AlumnoEjemplos.CEGA.Units
                 camera.TranslationMatrix);
         }
 
+        private void renderHUD()
+        {
+            tvidas.Text = "VIDAS = " + this.vidas.ToString();
+            tvidas.render();
+
+            if (ammo > -1)
+            {
+                tammo.Text = "AMMO = " + this.ammo.ToString();
+                
+            }else
+            {
+                tammo.Text = "AMMO = INF"; 
+            }
+            tammo.render();
+        }
+
         public void Render(Snipers scene)
         {
             if (this.vidas == 0)
@@ -288,9 +330,12 @@ namespace AlumnoEjemplos.CEGA.Units
             {
                 mira.render();
             }
+
+            renderHUD();
+            
             GuiController.Instance.Drawer2D.endDrawSprite();
         }
-
+                
         public void Dispose()
         {
             rifle.dispose();
