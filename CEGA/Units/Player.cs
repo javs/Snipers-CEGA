@@ -32,7 +32,10 @@ namespace AlumnoEjemplos.CEGA.Units
         TgcStaticSound sound_Zoom;
         TgcStaticSound sound_Disparo;
         TgcStaticSound sound_DryFire;
-        TgcStaticSound sound_Hit; //Podriamos hace que dependa de la respuesta del admin de colisiones para saber si fue headshot o un hit normal y reproducir sonidos distintos según cada cosa
+         
+        TgcStaticSound sound_Hit;
+        //Podriamos hace que dependa de la respuesta del admin de colisiones para saber si fue headshot o un hit normal y reproducir sonidos distintos según cada cosa
+        //Aparte, este sonido tendría que ser dinamico, casí ni escucharse si el enemigo esta lejos -Alex
 
         TgcSprite scope_stencil;
 
