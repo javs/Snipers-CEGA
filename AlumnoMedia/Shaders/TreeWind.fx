@@ -38,6 +38,8 @@ VS_OUTPUT_DEFAULT vs_simplewind(VS_INPUT_DEFAULT Input)
 {
 	VS_OUTPUT_DEFAULT Output;
 
+	// Ajusta el viento a la parte superior del arbol
+	//
 	float y_adjust = Input.Position.y - 5.0f;
 
 	if (y_adjust < 0.0f)

@@ -8,6 +8,7 @@ using TgcViewer.Utils.Terrain;
 using AlumnoEjemplos.CEGA.Interfaces;
 using TgcViewer.Utils.Shaders;
 using Microsoft.DirectX.Direct3D;
+using TgcViewer.Utils.Sound;
 
 namespace AlumnoEjemplos.CEGA.Scenes
 {
@@ -24,6 +25,9 @@ namespace AlumnoEjemplos.CEGA.Scenes
         Effect treeWindEffect;
 
         const float WIND_SPEED = 0.02f;
+
+        TgcStaticSound sound_WindLong;
+        TgcStaticSound sound_WindMedium;
 
         float time = 0.0f;
 
@@ -106,6 +110,12 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
             //Actualizar todos los valores para crear el SkyBox
             skyBox.updateValues();
+
+            sound_WindLong = new TgcStaticSound();
+            sound_WindLong.loadSound(mediaDir + @"Sound\viento_largo.wav", -2000);
+
+            sound_WindMedium = new TgcStaticSound();
+            sound_WindMedium.loadSound(mediaDir + @"Sound\viento_medio.wav", -2000);
         }
 
         public void Render(Snipers scene)
@@ -152,13 +162,18 @@ namespace AlumnoEjemplos.CEGA.Scenes
             
             float x = time * WIND_SPEED;
 
-            // Curva de viento para arboles. Basada en el Crysis.
+            // Curva de viento para arboles, basada en el Crysis.
             float wind_wave =
                 FastMath.Cos(x * FastMath.PI) *
                 FastMath.Cos(x * 3.0f * FastMath.PI) *
                 FastMath.Cos(x * 5.0f * FastMath.PI) *
                 FastMath.Cos(x * 7.0f * FastMath.PI) +
                 FastMath.Sin(x * 25.0f * FastMath.PI) * 0.1f;
+
+            if (FastMath.Abs(wind_wave) > 0.3f)
+                sound_WindLong.play();
+            else if (FastMath.Abs(wind_wave) > 0.13f)
+                sound_WindMedium.play();
 
             treeWindEffect.SetValue("wind_wave", wind_wave);
         }
