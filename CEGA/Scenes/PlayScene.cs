@@ -46,15 +46,20 @@ namespace AlumnoEjemplos.CEGA.Scenes
             TgcSceneLoader loader = new TgcSceneLoader();
             TgcScene scene = loader.loadSceneFromFile(mediaDir + "\\Pino-TgcScene.xml");
             
+
+
             TgcMesh pinoOriginal = scene.Meshes[0];
+            scene = loader.loadSceneFromFile(mediaDir + "\\BarrilPolvora-TgcScene.xml");
+
+            TgcMesh barrilOriginal = scene.Meshes[0];
 
             //Crear varias instancias del modelo original, pero sin volver a cargar el modelo entero cada vez, hace 23*23 = 529 pinos
             int rows = 23;
             int cols = 23;
 
-            Random offsetRnd = new Random();
+            Random RandomPlayScene = new Random();
 
-            int offset = offsetRnd.Next(100);
+            int offset = RandomPlayScene.Next(100);
 
             otrosObjetos = new List<TgcMesh>();
 
@@ -65,27 +70,44 @@ namespace AlumnoEjemplos.CEGA.Scenes
                     //Randomeo el proximo offset, de esta forma nunca vamos a tener 2 escenarios iguales, si queremos evitar que se superpongan cosas hay que fijarse acá.
                     //Si les parece que quedan muy concentrados en el origen podemos separarlo en 2 For (o en 4) para que no se peguen tanto cuando i=1 y j=1.
 
-                   offset = offsetRnd.Next(50,150);
+                   offset = RandomPlayScene.Next(50,150);
+                   int scale = RandomPlayScene.Next(10, 30);
                 
                     //Me fijo que quede dentro de los limites del mapa
 
                    if (i * offset > 2600 || j * offset > 2600)
-                       offset = offsetRnd.Next(10,100);
+                       offset = RandomPlayScene.Next(10,100);
 
                     //Crear instancia de modelo
-                    TgcMesh instance = pinoOriginal.createMeshInstance(pinoOriginal.Name + i + "_" + j);
-
+                   if (i == 23)
+                   {
+                       TgcMesh BarrilInstance = barrilOriginal.createMeshInstance(barrilOriginal.Name + i + j);
+                       BarrilInstance.move(j * offset, 0, i * offset);
+                       BarrilInstance.AlphaBlendEnable = true;
+                       BarrilInstance.Scale = new Vector3(0.09f, 0.09f, 0.09f);
+                       
+                       otrosObjetos.Add(BarrilInstance);
+                   }
+                   
+                        TgcMesh instance = pinoOriginal.createMeshInstance(pinoOriginal.Name + i + "_" + j);
+                   
+                   
                     //Desplazarlo
                     instance.move(i * offset, 0, j * offset);
                     instance.AlphaBlendEnable = true;
-                    instance.Scale = new Vector3(0.05f * offset / 5.0f, 0.05f * offset / 5.0f, 0.05f * offset / 5.0f);
 
+                    instance.Scale = new Vector3(0.05f * (scale) , 0.05f * (scale), 0.05f * (scale ));
+                    
+                    
+                   
                     //Modifico el BB del arbol para que sea solo el tronco
                     instance.AutoUpdateBoundingBox = false;
-                    instance.BoundingBox.scaleTranslate(instance.Position, new Vector3(0.02f, 0.1f, 0.02f));
-
+                    instance.BoundingBox.scaleTranslate(instance.Position, new Vector3(0.0012f * instance.BoundingBox.calculateSize().X, 0.0016f * instance.BoundingBox.calculateSize().Y, 0.0012f * instance.BoundingBox.calculateSize().Z));
+                    
+                    
                     instance.Effect = treeWindEffect;
                     instance.Technique = "SimpleWind";
+
 
                     otrosObjetos.Add(instance);
                 }
