@@ -31,6 +31,10 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
         float time = 0.0f;
 
+        float wind_wave_1;
+        float wind_wave_2;
+        float wind_wave_3;
+
         public PlayScene()
         {
             string mediaDir = GuiController.Instance.AlumnoEjemplosMediaDir;
@@ -145,12 +149,22 @@ namespace AlumnoEjemplos.CEGA.Scenes
             suelo.render();
             skyBox.render();
 
-            foreach (var mesh in otrosObjetos)
-            {
+            for (int i = 0; i < otrosObjetos.Count; i++)
+			{
+                if (i % 3 == 0)
+                    treeWindEffect.SetValue("wind_wave", wind_wave_1);
+                else if (i % 2 == 0)
+                    treeWindEffect.SetValue("wind_wave", wind_wave_2);
+                else
+                    treeWindEffect.SetValue("wind_wave", wind_wave_3);
+
+                TgcMesh mesh = otrosObjetos[i];
+
                 mesh.render();
+
                 if ((bool)GuiController.Instance.Modifiers.getValue("showBB"))
                     mesh.BoundingBox.render();
-            }
+			}
         }
 
         public void RenderUI(Snipers scene)
@@ -181,23 +195,28 @@ namespace AlumnoEjemplos.CEGA.Scenes
         public void Update(float elapsedTime)
         {
             time += elapsedTime;
-            
+
             float x = time * WIND_SPEED;
 
+            wind_wave_1 = WindCurve(x);
+            wind_wave_2 = WindCurve(x + 1.0f);
+            wind_wave_3 = WindCurve(x + 1.5f);
+
+            if (FastMath.Abs(wind_wave_1) > 0.3f)
+                sound_WindLong.play();
+            else if (FastMath.Abs(wind_wave_1) > 0.13f)
+                sound_WindMedium.play();
+        }
+
+        private float WindCurve(float x)
+        {
             // Curva de viento para arboles, basada en el Crysis.
-            float wind_wave =
+            return
                 FastMath.Cos(x * FastMath.PI) *
                 FastMath.Cos(x * 3.0f * FastMath.PI) *
                 FastMath.Cos(x * 5.0f * FastMath.PI) *
                 FastMath.Cos(x * 7.0f * FastMath.PI) +
                 FastMath.Sin(x * 25.0f * FastMath.PI) * 0.1f;
-
-            if (FastMath.Abs(wind_wave) > 0.3f)
-                sound_WindLong.play();
-            else if (FastMath.Abs(wind_wave) > 0.13f)
-                sound_WindMedium.play();
-
-            treeWindEffect.SetValue("wind_wave", wind_wave);
         }
     }
 }

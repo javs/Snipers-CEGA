@@ -46,6 +46,7 @@ VS_OUTPUT_DEFAULT vs_simplewind(VS_INPUT_DEFAULT Input)
 		y_adjust = 0.0f;
 
 	Input.Position.x += wind_wave * 5.0f * (y_adjust / 60.0f);
+	Input.Position.x += Input.Position.z * 0.2f * wind_wave;
 
 	Output.Position = mul(Input.Position, matWorldViewProj);
 	Output.Texcoord = Input.Texcoord;
