@@ -95,7 +95,7 @@ float4 ps_lens_distortion(float2 tex : TEXCOORD0) : COLOR0
 	// que son distintas entre si.
 	float3 inputDistordR = tex2D(pre_render_sampler, float2(x, y) + 0.0004f);
 	float3 inputDistordG = tex2D(pre_render_sampler, float2(x, y) - 0.0004f);
-	float3 inputDistordB = tex2D(pre_render_sampler, float2(x, y) + 0.001f);
+	float3 inputDistordB = tex2D(pre_render_sampler, float2(x, y - 0.005f));
 
 	// jj: tinte azul
 	return float4(inputDistordR.r, inputDistordG.g, inputDistordB.b + 0.02f, 1);
