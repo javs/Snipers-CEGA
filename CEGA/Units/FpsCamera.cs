@@ -407,9 +407,6 @@ namespace AlumnoEjemplos.CEGA.Units
             vM.M21 = xAxis.Y;   vM.M22 = yAxis.Y;   vM.M23 = zAxis.Y; // (2,4) = 0
             vM.M31 = xAxis.Z;   vM.M32 = yAxis.Z;   vM.M33 = zAxis.Z; // (3,4) = 0
 
-
-
-
             rotationChanged = false;
 
         Position:

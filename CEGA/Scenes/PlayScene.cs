@@ -6,18 +6,26 @@ using TgcViewer.Utils.TgcGeometry;
 using TgcViewer.Utils.TgcSceneLoader;
 using TgcViewer.Utils.Terrain;
 using AlumnoEjemplos.CEGA.Interfaces;
+using TgcViewer.Utils.Shaders;
+using Microsoft.DirectX.Direct3D;
 
 namespace AlumnoEjemplos.CEGA.Scenes
 {
     /// <summary>
     /// Representa el escenario donde se juega, con terreno y objetos inanimados
     /// </summary>
-    class PlayScene : IRenderable
+    class PlayScene : IRenderable, IUpdatable
     {
         private TgcBox suelo;
         private TgcSkyBox skyBox;
 
         List<TgcMesh> otrosObjetos;
+
+        Effect treeWindEffect;
+
+        const float WIND_SPEED = 0.02f;
+
+        float time = 0.0f;
 
         public PlayScene()
         {
@@ -27,6 +35,9 @@ namespace AlumnoEjemplos.CEGA.Scenes
                  mediaDir + "Textures\\Grass.jpg");
 
             suelo = TgcBox.fromSize(new Vector3(1300, 0, 1300), new Vector3(2800, 0, 2800), pisoTexture);
+
+            treeWindEffect = TgcShaders.loadEffect(
+                GuiController.Instance.AlumnoEjemplosMediaDir + "Shaders\\TreeWind.fx");
 
             TgcSceneLoader loader = new TgcSceneLoader();
             TgcScene scene = loader.loadSceneFromFile(mediaDir + "\\Pino-TgcScene.xml");
@@ -63,11 +74,14 @@ namespace AlumnoEjemplos.CEGA.Scenes
                     //Desplazarlo
                     instance.move(i * offset, 0, j * offset);
                     instance.AlphaBlendEnable = true;
-                    instance.Scale = new Vector3(0.25f, 0.25f, 0.25f);
+                    instance.Scale = new Vector3(0.05f * offset / 5.0f, 0.05f * offset / 5.0f, 0.05f * offset / 5.0f);
 
                     //Modifico el BB del arbol para que sea solo el tronco
                     instance.AutoUpdateBoundingBox = false;
                     instance.BoundingBox.scaleTranslate(instance.Position, new Vector3(0.02f, 0.1f, 0.02f));
+
+                    instance.Effect = treeWindEffect;
+                    instance.Technique = "SimpleWind";
 
                     otrosObjetos.Add(instance);
                 }
@@ -132,5 +146,21 @@ namespace AlumnoEjemplos.CEGA.Scenes
             return otrosObjetos;
         }
 
+        public void Update(float elapsedTime)
+        {
+            time += elapsedTime;
+            
+            float x = time * WIND_SPEED;
+
+            // Curva de viento para arboles. Basada en el Crysis.
+            float wind_wave =
+                FastMath.Cos(x * FastMath.PI) *
+                FastMath.Cos(x * 3.0f * FastMath.PI) *
+                FastMath.Cos(x * 5.0f * FastMath.PI) *
+                FastMath.Cos(x * 7.0f * FastMath.PI) +
+                FastMath.Sin(x * 25.0f * FastMath.PI) * 0.1f;
+
+            treeWindEffect.SetValue("wind_wave", wind_wave);
+        }
     }
 }

@@ -132,8 +132,9 @@ namespace AlumnoEjemplos.CEGA
         /// 
         public override void render(float elapsedTime)
         {
+            playScene.Update(elapsedTime);
             player.Update(elapsedTime);
-            enemigosAdmin.Update(elapsedTime);
+            //enemigosAdmin.Update(elapsedTime);
 
             Device d3dDevice = GuiController.Instance.D3dDevice;
 
