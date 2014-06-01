@@ -164,8 +164,10 @@ namespace AlumnoEjemplos.CEGA.Units
 
                 if (lockMouse)
                     Cursor.Hide();
+
                 else
                     Cursor.Show();
+
             }
 
             get { return lockMouse; }
@@ -235,6 +237,12 @@ namespace AlumnoEjemplos.CEGA.Units
             float elapsedTime = GuiController.Instance.ElapsedTime;
             TgcD3dInput input = GuiController.Instance.D3dInput;
 
+            if (input.keyPressed(Key.L))
+                LockMouse = !LockMouse;
+
+            if (!LockMouse)
+                return;
+
             // posicion
             //
             bool moved = false;
@@ -274,9 +282,6 @@ namespace AlumnoEjemplos.CEGA.Units
             // rotacion
             //
 
-            if (input.keyPressed(Key.L))
-                LockMouse = !LockMouse;
-
             // invertidos: moverse en x cambia el heading (rotacion sobre y) y viceversa.
             float rotY = input.XposRelative * rotationSpeed;
             float rotX = input.YposRelative * rotationSpeed;
@@ -286,6 +291,7 @@ namespace AlumnoEjemplos.CEGA.Units
 
             if (lockMouse)
                 Cursor.Position = windowCenter;
+
         }
 
         /// <summary>

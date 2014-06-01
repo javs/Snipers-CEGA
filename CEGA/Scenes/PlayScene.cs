@@ -19,6 +19,7 @@ namespace AlumnoEjemplos.CEGA.Scenes
     {
         private TgcBox suelo;
         private TgcSkyBox skyBox;
+        private TgcSimpleTerrain heightMap;
 
         List<TgcMesh> otrosObjetos;
 
@@ -43,6 +44,14 @@ namespace AlumnoEjemplos.CEGA.Scenes
                  mediaDir + "Textures\\Grass.jpg");
 
             suelo = TgcBox.fromSize(new Vector3(1300, 0, 1300), new Vector3(2800, 0, 2800), pisoTexture);
+
+
+            heightMap = new TgcSimpleTerrain();
+
+            heightMap.loadHeightmap(GuiController.Instance.AlumnoEjemplosMediaDir + "Heightmap\\" + "hmap3.jpg", 26, 2, new Vector3(52, 0, 48));
+            heightMap.loadTexture(GuiController.Instance.AlumnoEjemplosMediaDir + "Textures\\" + "HeightmapTexture.jpg");
+
+
 
             treeWindEffect = TgcShaders.loadEffect(
                 GuiController.Instance.AlumnoEjemplosMediaDir + "Shaders\\TreeWind.fx");
@@ -146,8 +155,9 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
         public void Render(Snipers scene)
         {
-            suelo.render();
+            //suelo.render();
             skyBox.render();
+            heightMap.render();
 
             for (int i = 0; i < otrosObjetos.Count; i++)
 			{
