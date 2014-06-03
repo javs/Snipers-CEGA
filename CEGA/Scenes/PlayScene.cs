@@ -22,6 +22,7 @@ namespace AlumnoEjemplos.CEGA.Scenes
         private TgcSimpleTerrain heightMap;
 
         List<TgcMesh> otrosObjetos;
+        List<TgcMesh> barrilesExplosivos; //Creo una lista de barriles, para optimizar las comparaciones de las colisiones
 
         Effect treeWindEffect;
 
@@ -75,6 +76,7 @@ namespace AlumnoEjemplos.CEGA.Scenes
             int offset = RandomPlayScene.Next(100);
 
             otrosObjetos = new List<TgcMesh>();
+            barrilesExplosivos = new List<TgcMesh>();
 
             for (int i = 1; i <= rows; i++)
             {
@@ -100,6 +102,7 @@ namespace AlumnoEjemplos.CEGA.Scenes
                        BarrilInstance.Scale = new Vector3(0.09f, 0.09f, 0.09f);
                        
                        otrosObjetos.Add(BarrilInstance);
+                       barrilesExplosivos.Add(BarrilInstance);
                    }
                    
                         TgcMesh instance = pinoOriginal.createMeshInstance(pinoOriginal.Name + i + "_" + j);
@@ -200,6 +203,11 @@ namespace AlumnoEjemplos.CEGA.Scenes
         public List<TgcMesh> ObjetosConColision()
         {
             return otrosObjetos;
+        }
+
+        public List<TgcMesh> BarrilesExplosivos()
+        {
+            return barrilesExplosivos;
         }
 
         public void Update(float elapsedTime)

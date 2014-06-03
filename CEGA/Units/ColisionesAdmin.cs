@@ -1,6 +1,7 @@
 ﻿using Microsoft.DirectX;
 using Microsoft.DirectX.Direct3D;
 using System.Drawing;
+using System.Collections.Generic;
 using TgcViewer;
 using TgcViewer.Example;
 using TgcViewer.Utils;
@@ -40,6 +41,8 @@ namespace AlumnoEjemplos.CEGA.Units
         {
             Vector3 interseccion;
             int i = 0;
+            int j = 0;
+
             float distancia;
 
             foreach (Enemigo enemigo in enemigos.listaDeEnemigos())
@@ -76,6 +79,54 @@ namespace AlumnoEjemplos.CEGA.Units
                 i++;
             }
 
+            i = 0;
+
+            foreach (TgcMesh barril in escenario.BarrilesExplosivos())
+            {
+
+                if (TgcCollisionUtils.intersectRayAABB(disparo, barril.BoundingBox, out interseccion))
+                {
+                    //Se podria hacer un objeto barril, por ahora meto el código acá. -Alex
+                    //Hasta aca ya sabemos que el disparo le dio al barril.
+                    float d, xc, zc;
+                    xc = barril.Position.X;
+                    zc = barril.Position.Z;
+
+                    foreach (Enemigo enemigo in enemigos.listaDeEnemigos())
+                    {
+                        //Calculo la distancia hasta el barril
+                        d = FastMath.Sqrt(FastMath.Pow2(enemigo.Position().X - xc) + FastMath.Pow2(enemigo.Position().Z - zc));
+                        //Me fijo si cumple con el radio (si tenemos el objeto barril, cada barril puede tener su radio)
+
+                        if (d <= 300) //Radio hardcodeado
+                        {
+                            enemigo.Herir(300/(0.5F*d));
+
+                            //Me fijo si murio. Esta logica podría estar en el enemigo directamente, cuando lo hiero, pero hay que ver como lo sacamos de la lista.
+                            if (enemigo.Murio())
+                            {
+                                enemigo.Morir();
+                                this.jugador.puntos += 10;
+                            }
+                        }
+
+                        j++;
+                    }
+
+                    enemigos.listaDeEnemigos().RemoveAll(e => e.Murio());
+                    
+
+                    //Aparte, el barril exploto...
+
+                    escenario.BarrilesExplosivos().RemoveAt(i);
+                    barril.dispose();
+                    return true;
+                }
+
+                i++;
+                j = 0;
+            }
+
             return false;
         }
 
@@ -88,7 +139,6 @@ namespace AlumnoEjemplos.CEGA.Units
                 if (TgcCollisionUtils.testSphereAABB(jugador.BoundingSphereJugador(), obstaculo.BoundingBox))
                     return true;
             }
-
             return false;
 
         }

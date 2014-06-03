@@ -127,6 +127,11 @@ namespace AlumnoEjemplos.CEGA.Units
             cabeza.dispose();
         }
 
+        public Vector3 Position()
+        {
+            return enemigo.Position;
+        }
+
         public TgcBoundingBox BoundingBoxEnemigo()
         {
             return enemigo.BoundingBox;
