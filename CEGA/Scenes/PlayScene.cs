@@ -19,7 +19,7 @@ namespace AlumnoEjemplos.CEGA.Scenes
     {
         private TgcBox suelo;
         private TgcSkyBox skyBox;
-        private TgcSimpleTerrain heightMap;
+        private SimpleTerrain heightMap;
 
         List<TgcMesh> otrosObjetos;
         List<TgcMesh> barrilesExplosivos; //Creo una lista de barriles, para optimizar las comparaciones de las colisiones
@@ -47,10 +47,10 @@ namespace AlumnoEjemplos.CEGA.Scenes
             suelo = TgcBox.fromSize(new Vector3(1300, 0, 1300), new Vector3(2800, 0, 2800), pisoTexture);
 
 
-            heightMap = new TgcSimpleTerrain();
+            heightMap = new SimpleTerrain();
 
             heightMap.loadHeightmap(GuiController.Instance.AlumnoEjemplosMediaDir + "Heightmap\\" + "hmap3.jpg", 26, 2, new Vector3(52, 0, 48));
-            heightMap.loadTexture(GuiController.Instance.AlumnoEjemplosMediaDir + "Textures\\" + "HeightmapTexture.jpg");
+            heightMap.loadTexture(GuiController.Instance.AlumnoEjemplosMediaDir + "Textures\\" + "Pasto.jpg");
 
 
 
@@ -164,6 +164,9 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
             for (int i = 0; i < otrosObjetos.Count; i++)
 			{
+               
+                
+                
                 if (i % 3 == 0)
                     treeWindEffect.SetValue("wind_wave", wind_wave_1);
                 else if (i % 2 == 0)
