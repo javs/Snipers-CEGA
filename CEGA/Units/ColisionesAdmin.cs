@@ -45,7 +45,7 @@ namespace AlumnoEjemplos.CEGA.Units
 
             float distancia;
 
-            foreach (Enemigo enemigo in enemigos.listaDeEnemigos())
+            foreach (Enemigo enemigo in enemigos.listaDeEnemigosOrdenadaPorDistancia())
             {
                 
                 if (TgcCollisionUtils.intersectRayAABB(disparo, enemigo.BoundingBoxEnemigo(), out interseccion))
@@ -54,8 +54,7 @@ namespace AlumnoEjemplos.CEGA.Units
 
                     if (enemigo.Murio())
                     {
-                        enemigo.Morir();
-                        enemigos.listaDeEnemigos().RemoveAt(i);
+                        enemigos.MatarEnemigo(enemigo.id);
                         this.jugador.puntos += 10;
                     }
 
@@ -69,10 +68,10 @@ namespace AlumnoEjemplos.CEGA.Units
 
                     if (enemigo.Murio())
                     {
-                        enemigo.Morir();
-                        enemigos.listaDeEnemigos().RemoveAt(i);
+                        enemigos.MatarEnemigo(enemigo.id);
                         this.jugador.puntos += 10;
                     }
+
                     this.jugador.puntos += 2;
                     return true;
                 }
@@ -105,7 +104,7 @@ namespace AlumnoEjemplos.CEGA.Units
                             //Me fijo si murio. Esta logica podría estar en el enemigo directamente, cuando lo hiero, pero hay que ver como lo sacamos de la lista.
                             if (enemigo.Murio())
                             {
-                                enemigo.Morir();
+                                enemigos.MatarEnemigo(enemigo.id);
                                 this.jugador.puntos += 10;
                             }
                         }

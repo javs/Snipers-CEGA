@@ -24,6 +24,8 @@ namespace AlumnoEjemplos.CEGA.Units
         Random randomEnemigo = new Random();
         TgcBoundingSphere cabeza;
         float hp;
+
+        public uint id { get; set; }
         
         public Enemigo(Vector3 posicion) 
         {

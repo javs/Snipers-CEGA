@@ -29,6 +29,8 @@ namespace AlumnoEjemplos.CEGA.Units
 
         List<Enemigo> listaEnemigos = new List<Enemigo>();
 
+        uint idEnemigo = 0;
+
         public EnemigosAdmin(PlayScene playScene)
         {
             limiteTerrenoInferior = playScene.BoundingBoxTerreno().PMin;
@@ -42,6 +44,8 @@ namespace AlumnoEjemplos.CEGA.Units
         {
             Vector3 posicion = this.PosicionEnemigo();
             Enemigo enemigo = new Enemigo(posicion);
+            enemigo.id = idEnemigo;
+            idEnemigo++;
             listaEnemigos.Add(enemigo);
         }
 
@@ -114,6 +118,41 @@ namespace AlumnoEjemplos.CEGA.Units
 
         public List<Enemigo> listaDeEnemigos() {
             return listaEnemigos;
+        }
+
+        public List<Enemigo> listaDeEnemigosOrdenadaPorDistancia() {
+
+            List<Enemigo> listaEnemigosOrdenada = new List<Enemigo>();
+            SortedDictionary<float,Enemigo> diccionario = new SortedDictionary<float,Enemigo>();
+            Vector3 posicionPlayer = GuiController.Instance.CurrentCamera.getPosition();
+
+            foreach (Enemigo enemigo in this.listaDeEnemigos())
+            {
+                float distancia = FastMath.Pow2(enemigo.Position().X - posicionPlayer.X) + FastMath.Pow2(enemigo.Position().Z - posicionPlayer.Z);
+                diccionario.Add(distancia, enemigo);
+            }
+
+            foreach (var entrada in diccionario) 
+            {
+                listaEnemigosOrdenada.Add(entrada.Value);
+            }
+
+            return listaEnemigosOrdenada;
+        }
+
+        public void MatarEnemigo(uint id)
+        {
+            int i = 0;
+            foreach (Enemigo enemigo in this.listaDeEnemigos())
+            {
+                if ( enemigo.id == id )
+                {
+                    enemigo.Morir();
+                    this.listaDeEnemigos().RemoveAt(i);
+                    return;
+                }
+                i++;
+            }
         }
 
         public void Inicializar()
