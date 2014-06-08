@@ -207,7 +207,6 @@ namespace AlumnoEjemplos.CEGA.Units
             if ( ColisionesAdmin.Instance.ColisionConEnemigos() )
             {
                 this.vidas -= 1;
-                GuiController.Instance.Logger.log("vidas: " + this.vidas);
                 camera.move(posicionInicial - camera.getPosition());
             }
 
