@@ -8,6 +8,7 @@ using TgcViewer.Utils.TgcGeometry;
 using TgcViewer.Utils.TgcSceneLoader;
 using TgcViewer.Utils.Sound;
 using AlumnoEjemplos.CEGA.Interfaces;
+using AlumnoEjemplos.CEGA.Scenes;
 
 namespace AlumnoEjemplos.CEGA.Units
 {
@@ -53,6 +54,11 @@ namespace AlumnoEjemplos.CEGA.Units
         TgcText2d tvidas;
         TgcText2d tammo;
         TgcText2d tpuntos;
+
+        int cameraPosX;
+        int cameraPosZ;
+        Vector3 rebote = new Vector3(0, 0, 0);
+        SimpleTerrain heightmap = PlayScene.Instance.heightMap;
 
         #region Constants
         const int zoomMaximo = 3;
@@ -191,6 +197,27 @@ namespace AlumnoEjemplos.CEGA.Units
             else if (GuiController.Instance.D3dInput.keyUp(Microsoft.DirectX.DirectInput.Key.LeftShift))
                 camera.MovementSpeed = WALKING_SPEED;
 
+            // limites del Heightmap, si llega a determinada altura, rebotar
+            cameraPosX = (int)(camera.getPosition().X + 598) / 26;
+            cameraPosZ = (int)(camera.getPosition().Z + 702) / 26;
+            
+            GuiController.Instance.Logger.log((heightmap.HeightmapData[cameraPosX, cameraPosZ]).ToString());
+
+
+            if (heightmap.HeightmapData[cameraPosX, cameraPosZ] > 11)
+            {
+                if (cameraPosX < 75)
+                    rebote.X = 1;
+                else
+                    rebote.X = -1;
+                if (cameraPosZ < 75)
+                    rebote.Z = 1;
+                else
+                    rebote.Z = -1;
+
+                camera.move(rebote);
+            }
+            
             /*Si se movio, chequeo colisiones con objetos... Esto no funciona como debería, aparte no podemos atajar el movimiento antes de renderearlo y queda medio feo.
              * para solucionarlo tendríamos que hacer que la camara sigua al mesh (es decir, que el mesh sea el que se mueve con WASD) y ahí podemos atajar la colision antes
              * El otro problema es como se genera el bounding box del mesh, deje seteado para que se renderize el mesh del sniper así lo ven, solucionar esto CREO que es facil
