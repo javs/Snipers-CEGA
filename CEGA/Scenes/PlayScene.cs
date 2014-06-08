@@ -9,6 +9,7 @@ using AlumnoEjemplos.CEGA.Interfaces;
 using TgcViewer.Utils.Shaders;
 using Microsoft.DirectX.Direct3D;
 using TgcViewer.Utils.Sound;
+using AlumnoEjemplos.CEGA.Units;
 
 namespace AlumnoEjemplos.CEGA.Scenes
 {
@@ -19,7 +20,9 @@ namespace AlumnoEjemplos.CEGA.Scenes
     {
         private TgcBox suelo;
         private TgcSkyBox skyBox;
-        private SimpleTerrain heightMap;
+        public SimpleTerrain heightMap;
+
+        TgcBox tgb;
 
         List<TgcMesh> otrosObjetos;
         List<TgcMesh> barrilesExplosivos; //Creo una lista de barriles, para optimizar las comparaciones de las colisiones
@@ -37,7 +40,18 @@ namespace AlumnoEjemplos.CEGA.Scenes
         float wind_wave_2;
         float wind_wave_3;
 
-        public PlayScene()
+        private static PlayScene instance;
+        public static PlayScene Instance
+        {
+            get
+            {
+                if (instance == null)
+                    instance = new PlayScene();
+                return instance;
+            }
+        }
+
+         public PlayScene()
         {
             string mediaDir = GuiController.Instance.AlumnoEjemplosMediaDir;
 
@@ -49,9 +63,8 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
             heightMap = new SimpleTerrain();
 
-            heightMap.loadHeightmap(GuiController.Instance.AlumnoEjemplosMediaDir + "Heightmap\\" + "hmap3.jpg", 26, 2, new Vector3(52, 0, 48));
-            heightMap.loadTexture(GuiController.Instance.AlumnoEjemplosMediaDir + "Textures\\" + "Pasto.jpg");
-
+            heightMap.loadHeightmap(GuiController.Instance.AlumnoEjemplosMediaDir + "Heightmap\\" + "hmap4.jpg", 26, 0.4f, new Vector3(52, 0, 48));
+            heightMap.loadTexture(GuiController.Instance.AlumnoEjemplosMediaDir + "Textures\\" + "grass2.jpg");
 
 
             treeWindEffect = TgcShaders.loadEffect(
@@ -127,6 +140,8 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
                     otrosObjetos.Add(instance);
                 }
+          
+                
             }
 
             //Sky Box
@@ -165,8 +180,6 @@ namespace AlumnoEjemplos.CEGA.Scenes
             for (int i = 0; i < otrosObjetos.Count; i++)
 			{
                
-                
-                
                 if (i % 3 == 0)
                     treeWindEffect.SetValue("wind_wave", wind_wave_1);
                 else if (i % 2 == 0)
@@ -180,6 +193,7 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
                 if ((bool)GuiController.Instance.Modifiers.getValue("showBB"))
                     mesh.BoundingBox.render();
+                
 			}
         }
 
@@ -187,6 +201,7 @@ namespace AlumnoEjemplos.CEGA.Scenes
         {
 
         }
+
 
         public void Dispose()
         {

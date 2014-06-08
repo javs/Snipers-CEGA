@@ -20,6 +20,8 @@ namespace AlumnoEjemplos.CEGA.Scenes
         Texture terrainTexture;
         int totalVertices;
 
+        CustomVertex.PositionTextured[] data;
+
         int[,] heightmapData;
         /// <summary>
         /// Valor de Y para cada par (X,Z) del Heightmap
@@ -92,6 +94,9 @@ namespace AlumnoEjemplos.CEGA.Scenes
             this.technique = TgcShaders.T_POSITION_TEXTURED;
         }
 
+
+
+
         /// <summary>
         /// Crea la malla de un terreno en base a un Heightmap
         /// </summary>
@@ -122,7 +127,7 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
             //Cargar vertices
             int dataIdx = 0;
-            CustomVertex.PositionTextured[] data = new CustomVertex.PositionTextured[totalVertices];
+            data = new CustomVertex.PositionTextured[totalVertices];
 
             center.X = center.X * scaleXZ - (width / 2) * scaleXZ;
             center.Y = center.Y * scaleY;
@@ -210,7 +215,39 @@ namespace AlumnoEjemplos.CEGA.Scenes
             terrainTexture = Texture.FromBitmap(d3dDevice, b, Usage.None, Pool.Managed);
         }
 
+        public float outOfBound(float x, int max)
+        {
+            if (x <= 0)
+                return 0;
+            if (x >= max)
+                return max;
+            return x;
+        }
 
+
+        public float obtenerAltura(float x, float z, float ScaleXZ)
+        {
+            int tamanio = heightmapData.GetLength(1);
+            float largo = ScaleXZ * tamanio;
+
+            float pos_i = outOfBound(tamanio * (0.5f + x / largo), (tamanio - 2));
+            float pos_j = outOfBound(tamanio * (0.5f + z / largo), (tamanio - 2));
+
+            int pi = (int)pos_i;
+            float fracc_i = pos_i - pi;
+            int pj = (int)pos_j;
+            float fracc_j = pos_j - pj;
+
+            // Promedio ponderado entre los 2x2 puntos: 
+            float H0 = data[((pj + 0) + (pi + 0) * tamanio)].Y;
+            float H1 = data[((pj + 0) + (pi + 1) * tamanio)].Y;
+            float H2 = data[((pj + 1) + (pi + 0) * tamanio)].Y;
+            float H3 = data[((pj + 1) + (pi + 1) * tamanio)].Y;
+
+            float H = (H0 * (1 - fracc_i) + H1 * fracc_i) * (1 - fracc_j) +
+                      (H2 * (1 - fracc_i) + H3 * fracc_i) * fracc_j;
+            return H;
+        }
 
 
         /// <summary>
