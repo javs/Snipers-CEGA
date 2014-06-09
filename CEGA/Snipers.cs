@@ -82,8 +82,9 @@ namespace AlumnoEjemplos.CEGA
             SetupPostProcessing();
 
             //Modifiers
-
             GuiController.Instance.Modifiers.addBoolean("showBB", "Mostrar BoundingBoxes", false);
+            GuiController.Instance.Modifiers.addBoolean("showQuadTree", "Mostrar QuadTree", false);
+
         }
 
         private void SetupPostProcessing()

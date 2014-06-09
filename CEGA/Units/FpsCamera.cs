@@ -178,8 +178,8 @@ namespace AlumnoEjemplos.CEGA.Units
             positionChanged = true;
             rotationChanged = true;
 
-            target  = new Vector3(0.0f, 5.0f, 1.0f);
-            eye     = new Vector3(0.0f, 5.0f, 0.0f);
+            target  = new Vector3(1000.0f, 5.0f, 1001.0f);
+            eye     = new Vector3(1000.0f, 5.0f, 1000.0f);
 
             vM = Matrix.Identity;
             rM = Matrix.Identity;

@@ -201,7 +201,6 @@ namespace AlumnoEjemplos.CEGA.Units
             cameraPosX = (int)(camera.getPosition().X + 598) / 26;
             cameraPosZ = (int)(camera.getPosition().Z + 702) / 26;
             
-            GuiController.Instance.Logger.log((heightmap.HeightmapData[cameraPosX, cameraPosZ]).ToString());
 
 
             if (heightmap.HeightmapData[cameraPosX, cameraPosZ] > 11)

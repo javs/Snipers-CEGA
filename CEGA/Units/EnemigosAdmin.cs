@@ -59,7 +59,7 @@ namespace AlumnoEjemplos.CEGA.Units
                 // hacer un spawn random del enemigo dentro de una distancia del jugador
                 Vector3 posicionPlayer = GuiController.Instance.CurrentCamera.getPosition();
 
-                int distanciaRandom = randomEnemigosAdmin.Next(80, 150);
+                int distanciaRandom = randomEnemigosAdmin.Next(160, 300);
                 float anguloRandom = ((float)randomEnemigosAdmin.Next(0, 100) / 50) * FastMath.PI;
 
                 float posicionX = distanciaRandom * FastMath.Cos(anguloRandom);

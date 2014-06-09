@@ -83,11 +83,21 @@ namespace AlumnoEjemplos.CEGA.Scenes
             set { technique = value; }
         }
 
+        private TgcBoundingBox boundingBox;
+
+        public TgcBoundingBox BoundingBox
+        {
+            get { return boundingBox; }
+        }
+
 
         public SimpleTerrain()
         {
             enabled = true;
             alphaBlendEnable = false;
+
+            //BoundingBox
+            boundingBox = new TgcBoundingBox();
 
             //Shader
             this.effect = GuiController.Instance.Shaders.VariosShader;
@@ -192,6 +202,17 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
             }
 
+            Vector3 min;
+            min.X = center.X + 200;
+            min.Y = center.Y;
+            min.Z = center.Z + 200;
+
+            Vector3 max;
+            max.X = center.X + (length - 10) * scaleXZ;
+            max.Y = center.Y + 200;
+            max.Z = center.Z + width * scaleXZ;
+
+            this.boundingBox.setExtremes(min, max);
 
             vbTerrain.SetData(data, 0, LockFlags.None);
         }
@@ -324,6 +345,7 @@ namespace AlumnoEjemplos.CEGA.Scenes
             {
                 terrainTexture.Dispose();
             }
+            boundingBox.dispose();
         }
 
     }

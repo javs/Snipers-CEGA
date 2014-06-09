@@ -22,8 +22,6 @@ namespace AlumnoEjemplos.CEGA.Scenes
         private TgcSkyBox skyBox;
         public SimpleTerrain heightMap;
 
-        TgcBox tgb;
-
         List<TgcMesh> otrosObjetos;
         List<TgcMesh> barrilesExplosivos; //Creo una lista de barriles, para optimizar las comparaciones de las colisiones
 
@@ -39,6 +37,8 @@ namespace AlumnoEjemplos.CEGA.Scenes
         float wind_wave_1;
         float wind_wave_2;
         float wind_wave_3;
+
+        QuadTree quadtree;
 
         private static PlayScene instance;
         public static PlayScene Instance
@@ -84,7 +84,7 @@ namespace AlumnoEjemplos.CEGA.Scenes
             int rows = 23;
             int cols = 23;
 
-            Random RandomPlayScene = new Random();
+            Random RandomPlayScene = new Random(10);
 
             int offset = RandomPlayScene.Next(100);
 
@@ -169,6 +169,11 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
             sound_WindMedium = new TgcStaticSound();
             sound_WindMedium.loadSound(mediaDir + @"Sound\viento_medio.wav", -2000);
+
+            //Crear Quadtree
+            quadtree = new QuadTree();
+            quadtree.create(otrosObjetos, heightMap.BoundingBox);
+            quadtree.createDebugQuadtreeMeshes();
         }
 
         public void Render(Snipers scene)
@@ -176,9 +181,10 @@ namespace AlumnoEjemplos.CEGA.Scenes
             //suelo.render();
             skyBox.render();
             heightMap.render();
+            quadtree.render(GuiController.Instance.Frustum, (bool)GuiController.Instance.Modifiers.getValue("showQuadTree"));
 
             for (int i = 0; i < otrosObjetos.Count; i++)
-			{
+            {
                
                 if (i % 3 == 0)
                     treeWindEffect.SetValue("wind_wave", wind_wave_1);
@@ -186,15 +192,8 @@ namespace AlumnoEjemplos.CEGA.Scenes
                     treeWindEffect.SetValue("wind_wave", wind_wave_2);
                 else
                     treeWindEffect.SetValue("wind_wave", wind_wave_3);
-
-                TgcMesh mesh = otrosObjetos[i];
-
-                mesh.render();
-
-                if ((bool)GuiController.Instance.Modifiers.getValue("showBB"))
-                    mesh.BoundingBox.render();
                 
-			}
+            }
         }
 
         public void RenderUI(Snipers scene)
