@@ -13,7 +13,7 @@ namespace AlumnoEjemplos.CEGA.Units
     {
         //Parametros de corte del QUADTRE
         int MAX_SECTOR_QUADTREE_RECURSION = 3;
-        int MIN_MESH_PER_LEAVE_THRESHOLD = 5;
+        int MAX_MESH_PER_LEAVE_THRESHOLD = 3;
 
         public QuadTreeNode crearQuadtree(List<TgcMesh> TgcMeshs, TgcBoundingBox sceneBounds)
         {
@@ -103,7 +103,7 @@ namespace AlumnoEjemplos.CEGA.Units
 
 
             //condicion de corte
-            if (step > MAX_SECTOR_QUADTREE_RECURSION || meshes.Count < MIN_MESH_PER_LEAVE_THRESHOLD)
+            if (step > MAX_SECTOR_QUADTREE_RECURSION || meshes.Count < MAX_MESH_PER_LEAVE_THRESHOLD)
             {
                 //cargar hijos de nodo positivo
                 posNode.models = possitiveList.ToArray();

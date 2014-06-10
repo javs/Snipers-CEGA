@@ -50,38 +50,18 @@ namespace AlumnoEjemplos.CEGA.Units
             debugQuadtreeBoxes = builder.createDebugQuadtreeMeshes(quadtreeRootNode, sceneBounds);
         }
 
-        /// <summary>
-        /// Renderizar en forma optimizado utilizando el Quadtree para hacer FrustumCulling
-        /// </summary>
-        public void render(TgcFrustum frustum, bool debugEnabled)
+        public List<TgcDebugBox> DebugQuadtreeBoxes()
         {
-            Vector3 pMax = sceneBounds.PMax;
-            Vector3 pMin = sceneBounds.PMin;
-            findVisibleMeshes(frustum, quadtreeRootNode,
-                pMin.X, pMin.Y, pMin.Z,
-                pMax.X, pMax.Y, pMax.Z);
-
-            //Renderizar
-            foreach (TgcMesh mesh in modelos)
-            {
-                if (mesh.Enabled)
-                {
-                    mesh.render();
-                    if ((bool)GuiController.Instance.Modifiers.getValue("showBB"))
-                        mesh.BoundingBox.render();
-                    mesh.Enabled = false;
-                }
-            }
-
-            if (debugEnabled)
-            {
-                foreach (TgcDebugBox debugBox in debugQuadtreeBoxes)
-                {
-                    debugBox.render();
-                }
-            }
+            return debugQuadtreeBoxes;
         }
 
+        public void findMeshes()
+        {
+
+            findVisibleMeshes(GuiController.Instance.Frustum, quadtreeRootNode,
+                sceneBounds.PMin.X, sceneBounds.PMin.Y, sceneBounds.PMin.Z,
+                sceneBounds.PMax.X, sceneBounds.PMax.Y, sceneBounds.PMax.Z);
+        }
 
         /// <summary>
         /// Recorrer recursivamente el Quadtree para encontrar los nodos visibles

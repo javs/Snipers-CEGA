@@ -183,17 +183,33 @@ namespace AlumnoEjemplos.CEGA.Scenes
             heightMap.render();
             if ((bool)GuiController.Instance.Modifiers.getValue("showBB"))
                 heightMap.BoundingBox.render();
-            quadtree.render(GuiController.Instance.Frustum, (bool)GuiController.Instance.Modifiers.getValue("showQuadTree"));
+
+            quadtree.findMeshes();
+            if ((bool)GuiController.Instance.Modifiers.getValue("showQuadTree"))
+            {
+                foreach (TgcDebugBox debugBox in quadtree.DebugQuadtreeBoxes())
+                {
+                    debugBox.render();
+                }
+            }
 
             for (int i = 0; i < otrosObjetos.Count; i++)
             {
-               
-                if (i % 3 == 0)
-                    treeWindEffect.SetValue("wind_wave", wind_wave_1);
-                else if (i % 2 == 0)
-                    treeWindEffect.SetValue("wind_wave", wind_wave_2);
-                else
-                    treeWindEffect.SetValue("wind_wave", wind_wave_3);
+                TgcMesh mesh = otrosObjetos[i];
+
+                if (mesh.Enabled)
+                {
+                    if (i % 3 == 0)
+                        treeWindEffect.SetValue("wind_wave", wind_wave_1);
+                    else if (i % 2 == 0)
+                        treeWindEffect.SetValue("wind_wave", wind_wave_2);
+                    else
+                        treeWindEffect.SetValue("wind_wave", wind_wave_3);
+                    mesh.render();
+                    if ((bool)GuiController.Instance.Modifiers.getValue("showBB"))
+                        mesh.BoundingBox.render();
+                    mesh.Enabled = false;
+                }
                 
             }
         }
