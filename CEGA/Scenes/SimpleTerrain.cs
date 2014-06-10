@@ -202,15 +202,17 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
             }
 
+            // establecer los limites del bounding box
+            // se acomodaron los min y max a mano para esten dento del area "recorrible"
             Vector3 min;
-            min.X = center.X + 200;
+            min.X = center.X + 425;
             min.Y = center.Y;
-            min.Z = center.Z + 200;
+            min.Z = center.Z + 425;
 
             Vector3 max;
-            max.X = center.X + (length - 10) * scaleXZ;
+            max.X = center.X + (length - 15) * scaleXZ;
             max.Y = center.Y + 200;
-            max.Z = center.Z + width * scaleXZ;
+            max.Z = center.Z + (width - 16) * scaleXZ;
 
             this.boundingBox.setExtremes(min, max);
 

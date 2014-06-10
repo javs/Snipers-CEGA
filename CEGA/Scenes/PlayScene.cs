@@ -181,6 +181,8 @@ namespace AlumnoEjemplos.CEGA.Scenes
             //suelo.render();
             skyBox.render();
             heightMap.render();
+            if ((bool)GuiController.Instance.Modifiers.getValue("showBB"))
+                heightMap.BoundingBox.render();
             quadtree.render(GuiController.Instance.Frustum, (bool)GuiController.Instance.Modifiers.getValue("showQuadTree"));
 
             for (int i = 0; i < otrosObjetos.Count; i++)
@@ -205,7 +207,8 @@ namespace AlumnoEjemplos.CEGA.Scenes
         public void Dispose()
         {
             skyBox.dispose();
-            suelo.dispose();
+            //suelo.dispose();
+            heightMap.dispose();
 
             foreach (var mesh in otrosObjetos)
             {
@@ -214,7 +217,8 @@ namespace AlumnoEjemplos.CEGA.Scenes
         }
         public TgcBoundingBox BoundingBoxTerreno()
         {
-            return suelo.BoundingBox;
+            //return suelo.BoundingBox;
+            return heightMap.BoundingBox;
         }
 
         public List<TgcMesh> ObjetosConColision()
