@@ -23,7 +23,6 @@ namespace AlumnoEjemplos.CEGA.Scenes
         public SimpleTerrain heightMap;
 
         List<TgcMesh> otrosObjetos;
-        List<TgcMesh> barrilesExplosivos; //Creo una lista de barriles, para optimizar las comparaciones de las colisiones
 
         Effect treeWindEffect;
 
@@ -52,7 +51,8 @@ namespace AlumnoEjemplos.CEGA.Scenes
         }
 
          public PlayScene()
-        {
+         {
+                
             string mediaDir = GuiController.Instance.AlumnoEjemplosMediaDir;
 
             TgcTexture pisoTexture = TgcTexture.createTexture(GuiController.Instance.D3dDevice,
@@ -89,7 +89,6 @@ namespace AlumnoEjemplos.CEGA.Scenes
             int offset = RandomPlayScene.Next(100);
 
             otrosObjetos = new List<TgcMesh>();
-            barrilesExplosivos = new List<TgcMesh>();
 
             for (int i = 1; i <= rows; i++)
             {
@@ -115,10 +114,9 @@ namespace AlumnoEjemplos.CEGA.Scenes
                        BarrilInstance.Scale = new Vector3(0.09f, 0.09f, 0.09f);
                        
                        otrosObjetos.Add(BarrilInstance);
-                       barrilesExplosivos.Add(BarrilInstance);
                    }
                    
-                        TgcMesh instance = pinoOriginal.createMeshInstance(pinoOriginal.Name + i + "_" + j);
+                    TgcMesh instance = pinoOriginal.createMeshInstance(pinoOriginal.Name + i + "_" + j);
                    
                    
                     //Desplazarlo
@@ -244,7 +242,28 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
         public List<TgcMesh> BarrilesExplosivos()
         {
+            List<TgcMesh> barrilesExplosivos = new List<TgcMesh>();
+
+            foreach (TgcMesh objeto in this.ObjetosConColision())
+            {
+                if (objeto.Name.StartsWith("Barril"))
+                    barrilesExplosivos.Add(objeto);
+            }
+
             return barrilesExplosivos;
+        }
+
+        public void BorrarObjeto(string nombre)
+        {
+            for (int i = 0; i < this.ObjetosConColision().Capacity; i++)
+            {
+                if (this.ObjetosConColision()[i].Name == nombre)
+                {
+                    this.ObjetosConColision()[i].dispose();
+                    this.ObjetosConColision().RemoveAt(i);
+                    break;
+                }
+            }
         }
 
         public void Update(float elapsedTime)

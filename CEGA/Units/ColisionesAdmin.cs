@@ -40,9 +40,6 @@ namespace AlumnoEjemplos.CEGA.Units
         public bool ColisionDisparo(TgcRay disparo)
         {
             Vector3 interseccion;
-            int i = 0;
-            int j = 0;
-
             float distancia;
 
             foreach (Enemigo enemigo in enemigos.listaDeEnemigosOrdenadaPorDistancia())
@@ -75,10 +72,7 @@ namespace AlumnoEjemplos.CEGA.Units
                     this.jugador.puntos += 2;
                     return true;
                 }
-                i++;
             }
-
-            i = 0;
 
             foreach (TgcMesh barril in escenario.BarrilesExplosivos())
             {
@@ -90,40 +84,34 @@ namespace AlumnoEjemplos.CEGA.Units
                     float d, xc, zc;
                     xc = barril.Position.X;
                     zc = barril.Position.Z;
+                    List<uint> enemigosMuertos = new List<uint>();
 
                     foreach (Enemigo enemigo in enemigos.listaDeEnemigos())
                     {
                         //Calculo la distancia hasta el barril
                         d = FastMath.Sqrt(FastMath.Pow2(enemigo.Position().X - xc) + FastMath.Pow2(enemigo.Position().Z - zc));
-                        //Me fijo si cumple con el radio (si tenemos el objeto barril, cada barril puede tener su radio)
 
+                        //Me fijo si cumple con el radio (si tenemos el objeto barril, cada barril puede tener su radio)
                         if (d <= 300) //Radio hardcodeado
                         {
-                            enemigo.Herir(300/(0.5F*d));
+                            enemigo.Herir(300/(0.05F*d));
 
-                            //Me fijo si murio. Esta logica podría estar en el enemigo directamente, cuando lo hiero, pero hay que ver como lo sacamos de la lista.
                             if (enemigo.Murio())
-                            {
-                                enemigos.MatarEnemigo(enemigo.id);
-                                this.jugador.puntos += 10;
-                            }
+                                enemigosMuertos.Add(enemigo.id);
                         }
 
-                        j++;
                     }
 
-                    enemigos.listaDeEnemigos().RemoveAll(e => e.Murio());
-                    
+                    foreach (uint id in enemigosMuertos)
+                    {
+                        enemigos.MatarEnemigo(id);
+                        this.jugador.puntos += 10;
+                    }
 
                     //Aparte, el barril exploto...
-
-                    escenario.BarrilesExplosivos().RemoveAt(i);
-                    barril.dispose();
+                    escenario.BorrarObjeto(barril.Name);
                     return true;
                 }
-
-                i++;
-                j = 0;
             }
 
             return false;
@@ -134,7 +122,6 @@ namespace AlumnoEjemplos.CEGA.Units
       
             foreach (TgcMesh obstaculo in escenario.ObjetosConColision())
             {
-                // usar el bounding box del arbol no esta bueno; ocupa mucho mas que el tronco
                 if (TgcCollisionUtils.testSphereAABB(jugador.BoundingSphereJugador(), obstaculo.BoundingBox))
                     return true;
             }
