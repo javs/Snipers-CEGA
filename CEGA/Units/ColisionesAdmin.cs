@@ -9,6 +9,7 @@ using TgcViewer.Utils.Shaders;
 using TgcViewer.Utils.TgcGeometry;
 using TgcViewer.Utils.TgcSceneLoader;
 using TgcViewer.Utils.Terrain;
+using TgcViewer.Utils.Sound;
 using AlumnoEjemplos.CEGA.Scenes;
 
 namespace AlumnoEjemplos.CEGA.Units
@@ -19,6 +20,8 @@ namespace AlumnoEjemplos.CEGA.Units
         public Player jugador {get;set;}
         public EnemigosAdmin enemigos {get;set;}
         public PlayScene escenario {get;set;}
+
+         TgcStaticSound sound_Explosion = new TgcStaticSound();
 
         #region Constants
         const float damage_Body = 50;
@@ -35,6 +38,12 @@ namespace AlumnoEjemplos.CEGA.Units
                     instance = new ColisionesAdmin();
                 return instance;
             }
+        }
+
+        public ColisionesAdmin()
+        {
+            sound_Explosion = new TgcStaticSound();
+            sound_Explosion.loadSound(GuiController.Instance.AlumnoEjemplosMediaDir + @"Sound\explosion.wav", -1000);
         }
 
         public bool ColisionDisparo(TgcRay disparo)
@@ -109,6 +118,8 @@ namespace AlumnoEjemplos.CEGA.Units
                     }
 
                     //Aparte, el barril exploto...
+                    sound_Explosion.play();
+
                     escenario.BorrarObjeto(barril.Name);
                     return true;
                 }
