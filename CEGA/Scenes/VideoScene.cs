@@ -40,15 +40,7 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
             for (int i = 1; i <= TotalFrames; i++)
             {
-                // TextureLoader carga mal algunas imagenes (mal tamaño)
-                string filepath = directory + @"\";
-                string filename = i.ToString("D4") + "." + format;
-
-                //Bitmap b = (Bitmap)Bitmap.FromFile(filepath + filename);
-                //Texture tex = Texture.FromBitmap(GuiController.Instance.D3dDevice, b, Usage.None, Pool.Managed);
-
-                Texture tex = TextureLoader.FromFile(GuiController.Instance.D3dDevice, filepath + filename);
-                frames[i - 1] = new TgcTexture(filename, filepath, tex, true);
+                frames[i - 1] = TgcTexture.createTexture(directory + @"\" + i.ToString("D4") + "." + format);
             }
 
             sprite = new TgcSprite();
