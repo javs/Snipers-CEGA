@@ -26,7 +26,26 @@ namespace AlumnoEjemplos.CEGA.Units
         float hp;
         Vector3 vectorNulo = new Vector3(0, 0, 0);
         Vector3 direccionAnterior = new Vector3(0, 0, 0);
-        
+
+        bool muriendo;
+
+        public bool Muriendo
+        {
+            get { return muriendo; }
+            set
+            {
+                muriendo = value;
+
+                if (muriendo)
+                    enemigo.playAnimation("Death", false);
+            }
+        }
+
+        public bool TerminoDeMorir
+        {
+            get { return muriendo && !enemigo.IsAnimating; }
+        }
+
         public bool colisionado { get; set; }
         
         public uint id { get; set; }
@@ -50,7 +69,8 @@ namespace AlumnoEjemplos.CEGA.Units
                 new string[] {
                     GuiController.Instance.ExamplesMediaDir + "SkeletalAnimations\\BasicHuman\\Animations\\" + "Walk-TgcSkeletalAnim.xml",
                     GuiController.Instance.ExamplesMediaDir + "SkeletalAnimations\\BasicHuman\\Animations\\" + "StandBy-TgcSkeletalAnim.xml",
-                    GuiController.Instance.ExamplesMediaDir + "SkeletalAnimations\\BasicHuman\\Animations\\" + "Run-TgcSkeletalAnim.xml"
+                    GuiController.Instance.ExamplesMediaDir + "SkeletalAnimations\\BasicHuman\\Animations\\" + "Run-TgcSkeletalAnim.xml",
+                    GuiController.Instance.ExamplesMediaDir + "SkeletalAnimations\\BasicHuman\\Animations\\" + "Death-TgcSkeletalAnim.xml",
                 });
 
 
@@ -126,8 +146,6 @@ namespace AlumnoEjemplos.CEGA.Units
             enemigo.move(direccionMovimiento * velocidadEnemigo * elapsedTime);
             cabeza.moveCenter(direccionMovimiento * velocidadEnemigo * elapsedTime);
             enemigo.BoundingBox.move(direccionMovimiento * velocidadEnemigo * elapsedTime);
-
-
        }
 
         public void Render(Snipers scene)
@@ -152,11 +170,6 @@ namespace AlumnoEjemplos.CEGA.Units
         public bool Murio()
         {
             return (hp <= 0);
-        }
-
-        public void Morir()
-        {
-            enemigo.dispose();
         }
 
         public void Dispose()

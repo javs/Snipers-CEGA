@@ -60,7 +60,7 @@ namespace AlumnoEjemplos.CEGA.Units
 
                     if (enemigo.Murio())
                     {
-                        enemigos.MatarEnemigo(enemigo.id);
+                        enemigo.Muriendo = true;
                         this.jugador.puntos += 10;
                     }
 
@@ -74,7 +74,7 @@ namespace AlumnoEjemplos.CEGA.Units
 
                     if (enemigo.Murio())
                     {
-                        enemigos.MatarEnemigo(enemigo.id);
+                        enemigo.Muriendo = true;
                         this.jugador.puntos += 10;
                     }
 
@@ -95,7 +95,9 @@ namespace AlumnoEjemplos.CEGA.Units
                     zc = barril.Position.Z;
                     List<uint> enemigosMuertos = new List<uint>();
 
-                    foreach (Enemigo enemigo in enemigos.ListaDeEnemigos())
+                    var listaDeEnemigos = enemigos.ListaDeEnemigos();
+
+                    foreach (var enemigo in listaDeEnemigos)
                     {
                         //Calculo la distancia hasta el barril
                         d = FastMath.Sqrt(FastMath.Pow2(enemigo.Position().X - xc) + FastMath.Pow2(enemigo.Position().Z - zc));
@@ -103,18 +105,14 @@ namespace AlumnoEjemplos.CEGA.Units
                         //Me fijo si cumple con el radio (si tenemos el objeto barril, cada barril puede tener su radio)
                         if (d <= 300) //Radio hardcodeado
                         {
-                            enemigo.Herir(300/(0.05F*d));
+                            enemigo.Herir(300 / (0.05F * d));
 
                             if (enemigo.Murio())
-                                enemigosMuertos.Add(enemigo.id);
+                            {
+                                enemigo.Muriendo = true;
+                                this.jugador.puntos += 10;
+                            }
                         }
-
-                    }
-
-                    foreach (uint id in enemigosMuertos)
-                    {
-                        enemigos.MatarEnemigo(id);
-                        this.jugador.puntos += 10;
                     }
 
                     //Aparte, el barril exploto...

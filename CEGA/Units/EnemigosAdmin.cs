@@ -90,9 +90,17 @@ namespace AlumnoEjemplos.CEGA.Units
                 this.AgregarEnemigo();
             }
 
-            foreach (Enemigo enemigo in listaEnemigos)
+            for (int i = 0; i < listaEnemigos.Count; i++)
             {
+                Enemigo enemigo = listaEnemigos[i];
+                
                 enemigo.Update(elapsedTime);
+
+                if (enemigo.TerminoDeMorir)
+                {
+                    enemigo.Dispose();
+                    listaEnemigos.RemoveAt(i);
+                }
             }
         }
     
@@ -138,21 +146,6 @@ namespace AlumnoEjemplos.CEGA.Units
             }
 
             return listaEnemigosOrdenada;
-        }
-
-        public void MatarEnemigo(uint id)
-        {
-            int i = 0;
-            foreach (Enemigo enemigo in this.ListaDeEnemigos())
-            {
-                if ( enemigo.id == id )
-                {
-                    enemigo.Morir();
-                    this.ListaDeEnemigos().RemoveAt(i);
-                    return;
-                }
-                i++;
-            }
         }
 
         public void Inicializar()
