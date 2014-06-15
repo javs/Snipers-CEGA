@@ -117,7 +117,7 @@ namespace AlumnoEjemplos.CEGA.Units
 
                     if (angulo < 0)
                         angulo += 360;
-                    direccionMovimiento = rotar90(angulo);
+                    direccionMovimiento = Rotar(angulo);
                     direccionAnterior = direccionMovimiento;
                 }
             }
@@ -167,7 +167,7 @@ namespace AlumnoEjemplos.CEGA.Units
         private const float LADO_CUBO = 1.0f;
         private const float MEDIO_LADO_CUBO = LADO_CUBO * 0.5f;
         private float STEP_ANGULO = LADO_CUBO / 90;
-        private Vector3 rotar90(float angulo)
+        private Vector3 Rotar(float angulo)
         {
             float x = 0;
             float y = 0;

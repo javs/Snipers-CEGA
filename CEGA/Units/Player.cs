@@ -23,9 +23,11 @@ namespace AlumnoEjemplos.CEGA.Units
 
         Boolean scope = false;
         Boolean puedeDisparar = true;
+        Boolean moviendo = false;
 
         float zoom = 1.0f;
         float elapsedROF;
+        float elapsedMOVE = 0.0f;
 
         Matrix matrizSinZoom = GuiController.Instance.D3dDevice.Transform.Projection;
         Matrix matrizConZoom = GuiController.Instance.D3dDevice.Transform.Projection;
@@ -184,10 +186,17 @@ namespace AlumnoEjemplos.CEGA.Units
 
         }
 
-        
-         private float RifleCurve(float x)
+         private float RifleCurvaMovimiento(float x)
          {
-             //GuiController.Instance.Frustum.NearPlane.C = 0;
+             short speed = 8;
+             if (camera.MovementSpeed == RUNNING_SPEED)
+                 speed = 10;
+             return FastMath.Sin(speed * x) / 12;
+
+         }
+        
+         private float RifleCurvaDisparo(float x)
+         {
              float f = - FastMath.Pow2(4 * x) + 3 * x;
              if (f < 0)
                  f = 0;
@@ -211,11 +220,21 @@ namespace AlumnoEjemplos.CEGA.Units
 
             if (!posicionSegura.Equals(camera.getPosition()))
             {
+                if (moviendo == false)
+                {
+                    elapsedMOVE = 0.0f;
+                    moviendo = true;
+                }
+                else
+                    elapsedMOVE += elapsedTime;
+
                 if (ColisionesAdmin.Instance.ColisionConObjetos())
                     camera.move(posicionSegura - camera.getPosition());
                 else
                     posicionSegura = camera.getPosition();
             }
+            else
+                moviendo = false;
 
             if ( ColisionesAdmin.Instance.ColisionConEnemigos() )
             {
@@ -314,8 +333,10 @@ namespace AlumnoEjemplos.CEGA.Units
             
             Matrix transformationMatrix = rifleBaseTransforms;
             if (puedeDisparar == false)
-                transformationMatrix = rifleBaseTransforms * Matrix.RotationX(this.RifleCurve(elapsedROF));
-                transformationMatrix = rifleBaseTransforms * Matrix.Translation(rifle.Position.X, rifle.Position.Y, rifle.Position.Z - this.RifleCurve(elapsedROF));
+                //transformationMatrix = rifleBaseTransforms * Matrix.RotationX(this.RifleCurvaDisparo(elapsedROF));
+                transformationMatrix = rifleBaseTransforms * Matrix.Translation(rifle.Position.X, rifle.Position.Y, rifle.Position.Z - this.RifleCurvaDisparo(elapsedROF));
+            if ( moviendo == true )
+                transformationMatrix = rifleBaseTransforms * Matrix.Translation(rifle.Position.X, rifle.Position.Y, rifle.Position.Z - this.RifleCurvaMovimiento(elapsedMOVE));
 
             rifle.Transform =
                 transformationMatrix *
