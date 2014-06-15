@@ -49,13 +49,13 @@ namespace AlumnoEjemplos.CEGA.Units
         public bool colisionado { get; set; }
         
         public uint id { get; set; }
-        
-        public Enemigo(Vector3 posicion) 
+
+        public Enemigo(Vector3 posicion)
         {
             //Cargar enemigo
             TgcSkeletalLoader skeletalLoader = new TgcSkeletalLoader();
+            
 
-          
             meshEnemigos.Add("BasicHuman-TgcSkeletalMesh.xml");
             meshEnemigos.Add("CombineSoldier-TgcSkeletalMesh.xml");
             meshEnemigos.Add("CS_Gign-TgcSkeletalMesh.xml");
@@ -78,23 +78,24 @@ namespace AlumnoEjemplos.CEGA.Units
             enemigo.Position = posicion;
             enemigo.Scale = new Vector3(0.12f, 0.12f, 0.12f);
             this.colisionado = false;
-        
+            
             //Inicializo HP
             hp = 100;
 
             //Creo el BB para la cabeza
-            cabeza = new TgcBoundingSphere(new Vector3(enemigo.Position.X,enemigo.Position.Y + 5.2F,enemigo.Position.Z), 0.5F); //Debe haber alguna forma de sacar esta info del hueso directamente
+            cabeza = new TgcBoundingSphere(new Vector3(enemigo.Position.X, enemigo.Position.Y + 5.2F,enemigo.Position.Z), 0.5F); //Debe haber alguna forma de sacar esta info del hueso directamente
             cabeza.setRenderColor(System.Drawing.Color.Red);
 
             //Modifico el BB del cuerpo
             enemigo.AutoUpdateBoundingBox = false;
             enemigo.BoundingBox.scaleTranslate(enemigo.Position, new Vector3(0.07f, 0.095f, 0.07f));
-            
+
         }
 
         public void Update(float elapsedTime)
         {
             int velocidadEnemigo = randomEnemigo.Next(10, 15);
+            float angulo;
             Enemigo otroEnemigo;
 
             Vector3 posicionPlayer = GuiController.Instance.CurrentCamera.getPosition();
@@ -107,15 +108,30 @@ namespace AlumnoEjemplos.CEGA.Units
 
             if (ColisionesAdmin.Instance.ColisionEnemigoConObjetos(this))
             {
-                direccionMovimiento.X += 50;
+                if (direccionAnterior == vectorNulo)
+                {
+                    angulo = (180 * (float)Math.Atan(direccionMovimiento.Z / direccionMovimiento.X)) / (float)Math.PI + 45;
+                    angulo += 90;
+                    if (angulo >= 360)
+                        angulo -= 360;
+
+                    if (angulo < 0)
+                        angulo += 360;
+                    direccionMovimiento = rotar90(angulo);
+                    direccionAnterior = direccionMovimiento;
+                }
+            }
+            else
+            {
+                direccionAnterior = vectorNulo;
             }
 
-            if ( this.colisionado == true )
+            if (this.colisionado == true)
             {
-                if ( direccionAnterior == vectorNulo )
+                if (direccionAnterior == vectorNulo)
                 {
-                    direccionMovimiento.X += randomEnemigo.Next(50,100);
-                    if ( randomEnemigo.Next(0,1) == 1)
+                    direccionMovimiento.X += randomEnemigo.Next(50, 100);
+                    if (randomEnemigo.Next(0, 2) == 1)
                         direccionMovimiento.X *= -1;
                     direccionAnterior = direccionMovimiento;
                 }
@@ -146,7 +162,49 @@ namespace AlumnoEjemplos.CEGA.Units
             enemigo.move(direccionMovimiento * velocidadEnemigo * elapsedTime);
             cabeza.moveCenter(direccionMovimiento * velocidadEnemigo * elapsedTime);
             enemigo.BoundingBox.move(direccionMovimiento * velocidadEnemigo * elapsedTime);
-       }
+        }
+
+        private const float LADO_CUBO = 1.0f;
+        private const float MEDIO_LADO_CUBO = LADO_CUBO * 0.5f;
+        private float STEP_ANGULO = LADO_CUBO / 90;
+        private Vector3 rotar90(float angulo)
+        {
+            float x = 0;
+            float y = 0;
+            float z = 0;
+
+            if (angulo < 180)
+            {
+                if (angulo < 90)
+                {
+                    z = angulo * STEP_ANGULO;
+                }
+                else
+                {
+                    z = LADO_CUBO;
+                    x = (angulo - 90) * STEP_ANGULO;
+                }
+                z = z - MEDIO_LADO_CUBO;
+                x = MEDIO_LADO_CUBO - x;
+            }
+            else
+            {
+                if (angulo < 270)
+                {
+                    z = (angulo - 180) * STEP_ANGULO;
+                }
+                else
+                {
+                    z = LADO_CUBO;
+                    x = (angulo - 270) * STEP_ANGULO;
+                }
+                z = MEDIO_LADO_CUBO - z;
+                x = x - MEDIO_LADO_CUBO;
+            }
+
+            return new Vector3(x, y, z);
+
+        }
 
         public void Render(Snipers scene)
         {
@@ -163,7 +221,8 @@ namespace AlumnoEjemplos.CEGA.Units
         {
         }
 
-        public void Herir(float hpARestar) {
+        public void Herir(float hpARestar)
+        {
             hp -= hpARestar;
         }
 
