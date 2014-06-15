@@ -82,6 +82,7 @@ namespace AlumnoEjemplos.CEGA.Scenes
             {
                 Playing = false;
                 sound.stop();
+                this.Dispose();
             }
             else
                 sprite.Texture = frames[current_frame];
