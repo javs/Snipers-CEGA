@@ -24,7 +24,11 @@ namespace AlumnoEjemplos.CEGA.Units
         Random randomEnemigo = new Random();
         TgcBoundingSphere cabeza;
         float hp;
-
+        Vector3 vectorNulo = new Vector3(0, 0, 0);
+        Vector3 direccionAnterior = new Vector3(0, 0, 0);
+        
+        public bool colisionado { get; set; }
+        
         public uint id { get; set; }
         
         public Enemigo(Vector3 posicion) 
@@ -53,6 +57,7 @@ namespace AlumnoEjemplos.CEGA.Units
             enemigo.playAnimation("Run", true);
             enemigo.Position = posicion;
             enemigo.Scale = new Vector3(0.12f, 0.12f, 0.12f);
+            this.colisionado = false;
         
             //Inicializo HP
             hp = 100;
@@ -70,29 +75,60 @@ namespace AlumnoEjemplos.CEGA.Units
         public void Update(float elapsedTime)
         {
             int velocidadEnemigo = randomEnemigo.Next(10, 15);
+            Enemigo otroEnemigo;
 
             Vector3 posicionPlayer = GuiController.Instance.CurrentCamera.getPosition();
 
             // vector con direccion al jugador
             Vector3 direccionPlayer = posicionPlayer - enemigo.Position;
-
-            // forzar la posicion 'Y' para que se mantenaga en el piso
             direccionPlayer.Y = 0;
 
-            // distancia al jugador
-            float distanciaPlayer = direccionPlayer.Length();
+            Vector3 direccionMovimiento = direccionPlayer;
 
-            direccionPlayer.Normalize();
-            enemigo.move(direccionPlayer * velocidadEnemigo * elapsedTime);
+            if (ColisionesAdmin.Instance.ColisionEnemigoConObjetos(this))
+            {
+                direccionMovimiento.X += 50;
+            }
+
+            if ( this.colisionado == true )
+            {
+                if ( direccionAnterior == vectorNulo )
+                {
+                    direccionMovimiento.X += randomEnemigo.Next(50,100);
+                    if ( randomEnemigo.Next(0,1) == 1)
+                        direccionMovimiento.X *= -1;
+                    direccionAnterior = direccionMovimiento;
+                }
+
+                if (!ColisionesAdmin.Instance.ColisionEnemigoConEnemigos(this, out otroEnemigo))
+                {
+                    this.colisionado = false;
+                    direccionAnterior = vectorNulo;
+                }
+
+            }
+            else
+            {
+                if (ColisionesAdmin.Instance.ColisionEnemigoConEnemigos(this, out otroEnemigo))
+                    otroEnemigo.colisionado = true;
+            }
+
+            if (direccionAnterior != vectorNulo)
+                direccionMovimiento = direccionAnterior;
+
+            direccionMovimiento.Normalize();
 
             // rotar al enemigo para que mire al jugador
-            enemigo.rotateY((float)Math.Atan2(direccionPlayer.X, direccionPlayer.Z) - enemigo.Rotation.Y + FastMath.PI);
+            enemigo.rotateY((float)Math.Atan2(direccionMovimiento.X, direccionMovimiento.Z) - enemigo.Rotation.Y + FastMath.PI);
 
             enemigo.updateAnimation();
 
-            cabeza.moveCenter(direccionPlayer * velocidadEnemigo * elapsedTime);
-            enemigo.BoundingBox.move(direccionPlayer * velocidadEnemigo * elapsedTime);
-        }
+            enemigo.move(direccionMovimiento * velocidadEnemigo * elapsedTime);
+            cabeza.moveCenter(direccionMovimiento * velocidadEnemigo * elapsedTime);
+            enemigo.BoundingBox.move(direccionMovimiento * velocidadEnemigo * elapsedTime);
+
+
+       }
 
         public void Render(Snipers scene)
         {

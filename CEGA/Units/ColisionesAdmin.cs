@@ -17,11 +17,11 @@ namespace AlumnoEjemplos.CEGA.Units
     class ColisionesAdmin
     {
 
-        public Player jugador {get;set;}
-        public EnemigosAdmin enemigos {get;set;}
-        public PlayScene escenario {get;set;}
+        public Player jugador { get; set; }
+        public EnemigosAdmin enemigos { get; set; }
+        public PlayScene escenario { get; set; }
 
-         TgcStaticSound sound_Explosion = new TgcStaticSound();
+        TgcStaticSound sound_Explosion = new TgcStaticSound();
 
         #region Constants
         const float damage_Body = 50;
@@ -51,7 +51,7 @@ namespace AlumnoEjemplos.CEGA.Units
             Vector3 interseccion;
             float distancia;
 
-            foreach (Enemigo enemigo in enemigos.listaDeEnemigosOrdenadaPorDistancia())
+            foreach (Enemigo enemigo in enemigos.ListaDeEnemigosOrdenadaPorDistancia())
             {
                 
                 if (TgcCollisionUtils.intersectRayAABB(disparo, enemigo.BoundingBoxEnemigo(), out interseccion))
@@ -95,7 +95,7 @@ namespace AlumnoEjemplos.CEGA.Units
                     zc = barril.Position.Z;
                     List<uint> enemigosMuertos = new List<uint>();
 
-                    foreach (Enemigo enemigo in enemigos.listaDeEnemigos())
+                    foreach (Enemigo enemigo in enemigos.ListaDeEnemigos())
                     {
                         //Calculo la distancia hasta el barril
                         d = FastMath.Sqrt(FastMath.Pow2(enemigo.Position().X - xc) + FastMath.Pow2(enemigo.Position().Z - zc));
@@ -131,7 +131,7 @@ namespace AlumnoEjemplos.CEGA.Units
         public bool ColisionConObjetos() 
         {
       
-            foreach (TgcMesh obstaculo in escenario.ObjetosConColision())
+            foreach (TgcMesh obstaculo in escenario.ObjetosConColisionCerca(jugador.BoundingBoxJugador()))
             {
                 if (TgcCollisionUtils.testSphereAABB(jugador.BoundingSphereJugador(), obstaculo.BoundingBox))
                     return true;
@@ -142,7 +142,7 @@ namespace AlumnoEjemplos.CEGA.Units
 
         public bool ColisionConEnemigos()
         {
-            foreach (Enemigo enemigo in enemigos.listaDeEnemigos())
+            foreach (Enemigo enemigo in enemigos.ListaDeEnemigos())
             {
                 if (TgcCollisionUtils.testSphereAABB(jugador.BoundingSphereJugador(), enemigo.BoundingBoxEnemigo()))
                 {
@@ -154,5 +154,31 @@ namespace AlumnoEjemplos.CEGA.Units
             return false;
         }
 
+        public bool ColisionEnemigoConObjetos(Enemigo enemigo)
+        {
+            foreach (TgcMesh obstaculo in escenario.ObjetosConColisionCerca(enemigo.BoundingBoxEnemigo()))
+            {
+                if (TgcCollisionUtils.testAABBAABB(enemigo.BoundingBoxEnemigo(), obstaculo.BoundingBox))
+                    return true;
+            }
+            return false;
+        }
+
+        public bool ColisionEnemigoConEnemigos(Enemigo enemigo, out Enemigo enemigoColision)
+        {
+            foreach (Enemigo otroEnemigo in enemigos.ListaDeEnemigos())
+            {
+                if (enemigo == otroEnemigo)
+                    continue;
+                if (TgcCollisionUtils.testAABBAABB(enemigo.BoundingBoxEnemigo(), otroEnemigo.BoundingBoxEnemigo()))
+                {
+                    enemigoColision = otroEnemigo;
+                    return true;
+                }
+            }
+            enemigoColision = null;
+            return false;
+        }
+		
     }
 }

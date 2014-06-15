@@ -89,7 +89,7 @@ namespace AlumnoEjemplos.CEGA
 
             //Modifiers
             GuiController.Instance.Modifiers.addBoolean("showBB", "Mostrar BoundingBoxes", false);
-            GuiController.Instance.Modifiers.addBoolean("showQuadTree", "Mostrar QuadTree", false);
+            GuiController.Instance.Modifiers.addBoolean("showGrilla", "Mostrar Grilla", false);
 
             video = new VideoScene(GuiController.Instance.AlumnoEjemplosMediaDir + @"Video\CEGA",
                 "jpg", 24.0f, 196);

@@ -37,7 +37,7 @@ namespace AlumnoEjemplos.CEGA.Scenes
         float wind_wave_2;
         float wind_wave_3;
 
-        QuadTree quadtree;
+        GrillaRegular grilla;
 
         private static PlayScene instance;
         public static PlayScene Instance
@@ -168,10 +168,10 @@ namespace AlumnoEjemplos.CEGA.Scenes
             sound_WindMedium = new TgcStaticSound();
             sound_WindMedium.loadSound(mediaDir + @"Sound\viento_medio.wav", -2000);
 
-            //Crear Quadtree
-            quadtree = new QuadTree();
-            quadtree.create(otrosObjetos, heightMap.BoundingBox);
-            quadtree.createDebugQuadtreeMeshes();
+            //Crear Grilla
+            grilla = new GrillaRegular();
+            grilla.create(otrosObjetos, heightMap.BoundingBox);
+            grilla.createDebugMeshes();
         }
 
         public void Render(Snipers scene)
@@ -183,10 +183,10 @@ namespace AlumnoEjemplos.CEGA.Scenes
             if ((bool)GuiController.Instance.Modifiers.getValue("showBB"))
                 heightMap.BoundingBox.render();
 
-            quadtree.findMeshes();
-            if ((bool)GuiController.Instance.Modifiers.getValue("showQuadTree"))
+            this.UpdateVisibleMeshes();
+            if ((bool)GuiController.Instance.Modifiers.getValue("showGrilla"))
             {
-                foreach (TgcDebugBox debugBox in quadtree.DebugQuadtreeBoxes())
+                foreach (TgcDebugBox debugBox in grilla.DebugGrillaBoxes())
                 {
                     debugBox.render();
                 }
@@ -222,6 +222,10 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
         }
 
+        public void UpdateVisibleMeshes()
+        {
+            this.grilla.UpdateVisibleMeshes(GuiController.Instance.Frustum);
+        }
 
         public void Dispose()
         {
@@ -243,6 +247,26 @@ namespace AlumnoEjemplos.CEGA.Scenes
         public List<TgcMesh> ObjetosConColision()
         {
             return otrosObjetos;
+        }
+
+        public List<TgcMesh> ObjetosConColisionCerca(TgcBoundingBox bb)
+        {
+            List<TgcMesh> listaObjetos = new List<TgcMesh>();
+
+            foreach (GrillaRegularNode nodo in this.grilla.NodosCercanos(bb))
+            {
+                foreach (TgcMesh objeto in nodo.Models)
+                {
+                    listaObjetos.Add(objeto);
+                }
+            }
+
+            return listaObjetos;
+        }
+
+        public GrillaRegular Grilla()
+        {
+            return this.grilla;
         }
 
         public List<TgcMesh> BarrilesExplosivos()
