@@ -116,17 +116,17 @@ namespace AlumnoEjemplos.CEGA.Units
             }
         }
 
-        public List<Enemigo> listaDeEnemigos() {
+        public List<Enemigo> ListaDeEnemigos() {
             return listaEnemigos;
         }
 
-        public List<Enemigo> listaDeEnemigosOrdenadaPorDistancia() {
+        public List<Enemigo> ListaDeEnemigosOrdenadaPorDistancia() {
 
             List<Enemigo> listaEnemigosOrdenada = new List<Enemigo>();
             SortedDictionary<float,Enemigo> diccionario = new SortedDictionary<float,Enemigo>();
             Vector3 posicionPlayer = GuiController.Instance.CurrentCamera.getPosition();
 
-            foreach (Enemigo enemigo in this.listaDeEnemigos())
+            foreach (Enemigo enemigo in this.ListaDeEnemigos())
             {
                 float distancia = FastMath.Pow2(enemigo.Position().X - posicionPlayer.X) + FastMath.Pow2(enemigo.Position().Z - posicionPlayer.Z);
                 diccionario.Add(distancia, enemigo);
@@ -143,12 +143,12 @@ namespace AlumnoEjemplos.CEGA.Units
         public void MatarEnemigo(uint id)
         {
             int i = 0;
-            foreach (Enemigo enemigo in this.listaDeEnemigos())
+            foreach (Enemigo enemigo in this.ListaDeEnemigos())
             {
                 if ( enemigo.id == id )
                 {
                     enemigo.Morir();
-                    this.listaDeEnemigos().RemoveAt(i);
+                    this.ListaDeEnemigos().RemoveAt(i);
                     return;
                 }
                 i++;

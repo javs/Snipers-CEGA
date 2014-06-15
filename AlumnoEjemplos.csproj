@@ -94,12 +94,11 @@
     <Compile Include="CEGA\Interfaces\IRenderable.cs" />
     <Compile Include="CEGA\Interfaces\IUpdatable.cs" />
     <Compile Include="CEGA\Units\FpsCamera.cs" />
+    <Compile Include="CEGA\Units\GrillaRegular.cs" />
+    <Compile Include="CEGA\Units\GrillaRegularNode.cs" />
     <Compile Include="CEGA\Units\Player.cs" />
     <Compile Include="CEGA\Scenes\PlayScene.cs" />
     <Compile Include="CEGA\Snipers.cs" />
-    <Compile Include="CEGA\Units\QuadTree.cs" />
-    <Compile Include="CEGA\Units\QuadTreeBuilder.cs" />
-    <Compile Include="CEGA\Units\QuadTreeNode.cs" />
     <Compile Include="MiGrupo\EjemploAlumno.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

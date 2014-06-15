@@ -83,7 +83,7 @@ namespace AlumnoEjemplos.CEGA
 
             //Modifiers
             GuiController.Instance.Modifiers.addBoolean("showBB", "Mostrar BoundingBoxes", false);
-            GuiController.Instance.Modifiers.addBoolean("showQuadTree", "Mostrar QuadTree", false);
+            GuiController.Instance.Modifiers.addBoolean("showGrilla", "Mostrar Grilla", false);
 
         }
 
