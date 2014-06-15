@@ -184,7 +184,16 @@ namespace AlumnoEjemplos.CEGA.Units
 
         }
 
-
+        
+         private float RifleCurve(float x)
+         {
+             //GuiController.Instance.Frustum.NearPlane.C = 0;
+             float f = - FastMath.Pow2(4 * x) + 3 * x;
+             if (f < 0)
+                 f = 0;
+             return f;
+             
+         }
 
         public void Update(float elapsedTime)
         {
@@ -302,10 +311,17 @@ namespace AlumnoEjemplos.CEGA.Units
         /// </summary>
         private void UpdateRifle()
         {
+            
+            Matrix transformationMatrix = rifleBaseTransforms;
+            if (puedeDisparar == false)
+                transformationMatrix = rifleBaseTransforms * Matrix.RotationX(this.RifleCurve(elapsedROF));
+                transformationMatrix = rifleBaseTransforms * Matrix.Translation(rifle.Position.X, rifle.Position.Y, rifle.Position.Z - this.RifleCurve(elapsedROF));
+
             rifle.Transform =
-                rifleBaseTransforms *
+                transformationMatrix *
                 camera.RotationMatrix *
                 camera.TranslationMatrix;
+
 
             rifle.BoundingBox.transform(rifleBaseTransforms *
                 camera.RotationMatrix *
