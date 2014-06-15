@@ -134,6 +134,14 @@ namespace AlumnoEjemplos.CEGA.Units
                 if (TgcCollisionUtils.testSphereAABB(jugador.BoundingSphereJugador(), obstaculo.BoundingBox))
                     return true;
             }
+
+            // limites del Heightmap, si llega a determinada altura, rebotar
+            int cameraPosX = (int)(GuiController.Instance.CurrentCamera.getPosition().X + 598) / 26;
+            int cameraPosZ = (int)(GuiController.Instance.CurrentCamera.getPosition().Z + 702) / 26;
+
+            if (escenario.heightMap.HeightmapData[cameraPosX, cameraPosZ] > 11)
+                return true;
+
             return false;
 
         }

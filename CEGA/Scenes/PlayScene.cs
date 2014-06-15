@@ -30,6 +30,7 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
         TgcStaticSound sound_WindLong;
         TgcStaticSound sound_WindMedium;
+        TgcStaticSound sound_music;
 
         float time = 0.0f;
 
@@ -39,20 +40,9 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
         GrillaRegular grilla;
 
-        private static PlayScene instance;
-        public static PlayScene Instance
+        public PlayScene()
         {
-            get
-            {
-                if (instance == null)
-                    instance = new PlayScene();
-                return instance;
-            }
-        }
 
-         public PlayScene()
-         {
-                
             string mediaDir = GuiController.Instance.AlumnoEjemplosMediaDir;
 
             TgcTexture pisoTexture = TgcTexture.createTexture(GuiController.Instance.D3dDevice,
@@ -72,7 +62,7 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
             TgcSceneLoader loader = new TgcSceneLoader();
             TgcScene scene = loader.loadSceneFromFile(mediaDir + "\\Pino-TgcScene.xml");
-            
+
 
 
             TgcMesh pinoOriginal = scene.Meshes[0];
@@ -97,49 +87,49 @@ namespace AlumnoEjemplos.CEGA.Scenes
                     //Randomeo el proximo offset, de esta forma nunca vamos a tener 2 escenarios iguales, si queremos evitar que se superpongan cosas hay que fijarse acá.
                     //Si les parece que quedan muy concentrados en el origen podemos separarlo en 2 For (o en 4) para que no se peguen tanto cuando i=1 y j=1.
 
-                   offset = RandomPlayScene.Next(50,150);
-                   int scale = RandomPlayScene.Next(10, 30);
-                
+                    offset = RandomPlayScene.Next(50, 150);
+                    int scale = RandomPlayScene.Next(10, 30);
+
                     //Me fijo que quede dentro de los limites del mapa
 
-                   if (i * offset > 2600 || j * offset > 2600)
-                       offset = RandomPlayScene.Next(10,100);
+                    if (i * offset > 2600 || j * offset > 2600)
+                        offset = RandomPlayScene.Next(10, 100);
 
                     //Crear instancia de modelo
-                   if (i == 23)
-                   {
-                       TgcMesh BarrilInstance = barrilOriginal.createMeshInstance(barrilOriginal.Name + i + j);
-                       BarrilInstance.move(j * offset, 0, i * offset);
-                       BarrilInstance.AlphaBlendEnable = true;
-                       BarrilInstance.Scale = new Vector3(0.09f, 0.09f, 0.09f);
-                       
-                       otrosObjetos.Add(BarrilInstance);
-                   }
-                   
+                    if (i == 23)
+                    {
+                        TgcMesh BarrilInstance = barrilOriginal.createMeshInstance(barrilOriginal.Name + i + j);
+                        BarrilInstance.move(j * offset, 0, i * offset);
+                        BarrilInstance.AlphaBlendEnable = true;
+                        BarrilInstance.Scale = new Vector3(0.09f, 0.09f, 0.09f);
+
+                        otrosObjetos.Add(BarrilInstance);
+                    }
+
                     TgcMesh instance = pinoOriginal.createMeshInstance(pinoOriginal.Name + i + "_" + j);
-                   
-                   
+
+
                     //Desplazarlo
                     instance.move(i * offset, 0, j * offset);
                     instance.AlphaBlendEnable = true;
 
-                    instance.Scale = new Vector3(0.05f * (scale) , 0.05f * (scale), 0.05f * (scale ));
-                    
-                    
-                   
+                    instance.Scale = new Vector3(0.05f * (scale), 0.05f * (scale), 0.05f * (scale));
+
+
+
                     //Modifico el BB del arbol para que sea solo el tronco
                     instance.AutoUpdateBoundingBox = false;
                     instance.BoundingBox.scaleTranslate(instance.Position, new Vector3(0.0012f * instance.BoundingBox.calculateSize().X, 0.0016f * instance.BoundingBox.calculateSize().Y, 0.0012f * instance.BoundingBox.calculateSize().Z));
-                    
-                    
+
+
                     instance.Effect = treeWindEffect;
                     instance.Technique = "SimpleWind";
 
 
                     otrosObjetos.Add(instance);
                 }
-          
-                
+
+
             }
 
             //Sky Box
@@ -167,6 +157,10 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
             sound_WindMedium = new TgcStaticSound();
             sound_WindMedium.loadSound(mediaDir + @"Sound\viento_medio.wav", -2000);
+
+            sound_music = new TgcStaticSound();
+            sound_music.loadSound(mediaDir + @"Sound\rabbia.wav", -2000);
+            sound_music.play(true);
 
             //Crear Grilla
             grilla = new GrillaRegular();
@@ -213,7 +207,7 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
                     mesh.Enabled = false;
                 }
-                
+
             }
         }
 
