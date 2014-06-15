@@ -6,6 +6,7 @@ float4x4 matWorldViewProj; //Matriz World * View * Projection
 float4x4 matInverseTransposeWorld; //Matriz Transpose(Invert(World))
 
 float wind_wave;
+float4 cameraPosition;
 
 static const float PI = 3.14159265f;
 
@@ -24,14 +25,19 @@ struct VS_INPUT_DEFAULT
 {
 	float4 Position : POSITION0;
 	float2 Texcoord : TEXCOORD0;
-	float4 Color : COLOR0;
 };
 
 struct VS_OUTPUT_DEFAULT
 {
 	float4 Position : POSITION0;
 	float2 Texcoord : TEXCOORD0;
+	float Fog : FOG;
+};
+
+struct PS_OUTPUT
+{
 	float4 Color : COLOR0;
+	//float Depth : DEPTH;
 };
 
 VS_OUTPUT_DEFAULT vs_simplewind(VS_INPUT_DEFAULT Input)
@@ -50,14 +56,33 @@ VS_OUTPUT_DEFAULT vs_simplewind(VS_INPUT_DEFAULT Input)
 
 	Output.Position = mul(Input.Position, matWorldViewProj);
 	Output.Texcoord = Input.Texcoord;
-	Output.Color = Input.Color;
+
+	// Calculo del factor de fog
+	float4 cameraPosition = mul(Input.Position, matWorldView);
+	Output.Fog = saturate((2500.0f - cameraPosition.z) / (2500.0f - 250.f));
 	
 	return Output;
 }
 
-float4 ps_noeffect(float2 Texcoord : TEXCOORD0) : COLOR0
+PS_OUTPUT ps_fog(float2 Texcoord : TEXCOORD0, float Fog : FOG)
 {
-	return tex2D(diffuseMap, Texcoord);
+	PS_OUTPUT Output;
+
+	float4 textureColor;
+	float4 fogColor;
+
+	textureColor = tex2D(diffuseMap, Texcoord);
+
+	// fog lineal
+	// JJ: por alguna razon, el device driver no aplica pixel fog a estos vertices (deberia?)
+	// calcularlo manualmente.
+	fogColor = float4(0.5f, 0.5f, 0.5f, 1.0f);
+	Output.Color = Fog * textureColor + (1.0 - Fog) * fogColor;
+
+	// correccion del alpha channel
+	Output.Color.a = textureColor.a;
+
+	return Output;
 }
 
 technique SimpleWind
@@ -65,6 +90,6 @@ technique SimpleWind
 	pass Pass_0
 	{
 		VertexShader = compile vs_3_0 vs_simplewind();
-		PixelShader  = compile ps_3_0 ps_noeffect();
+		PixelShader = compile ps_3_0 ps_fog();
 	}
 }

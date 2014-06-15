@@ -8,6 +8,7 @@ using TgcViewer.Utils.Shaders;
 using AlumnoEjemplos.CEGA.Units;
 using AlumnoEjemplos.CEGA.Scenes;
 using TgcViewer.Utils.TgcGeometry;
+using System.Windows.Forms;
 
 namespace AlumnoEjemplos.CEGA
 {
@@ -75,6 +76,13 @@ namespace AlumnoEjemplos.CEGA
         /// 
         public override void init()
         {
+            Control panel = GuiController.Instance.Panel3d;
+
+            // Corrige el near plane
+            GuiController.Instance.D3dDevice.Transform.Projection =
+                Matrix.PerspectiveFovLH(Geometry.DegreeToRadian(45.0f),
+                (float)panel.Width / panel.Height, 0.5f, 10000.0f);
+
             playScene = new PlayScene();
             player = new Player();
             enemigosAdmin = new EnemigosAdmin(playScene);
@@ -172,12 +180,16 @@ namespace AlumnoEjemplos.CEGA
 
             d3dDevice.SetRenderTarget(0, preTarget);
             d3dDevice.DepthStencilSurface = preDepthStencil;
+            SetupFog(d3dDevice, Color.Gray, -20.0f, 2600.0f);
+            //SetupFog(d3dDevice, Color.Gray, 0.5f, 0.8f);
 
             d3dDevice.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
             
             RenderScene(d3dDevice);
 
             preTarget.Dispose();
+
+            d3dDevice.RenderState.FogEnable = false;
 
             // para debugear:
             //TextureLoader.Save(GuiController.Instance.AlumnoEjemplosMediaDir + "Shaders\\render_target.bmp",
@@ -193,6 +205,15 @@ namespace AlumnoEjemplos.CEGA
             // Render de UI
             //
             RenderUI(d3dDevice);
+        }
+
+        void SetupFog(Device device, Color color, float start, float end)
+        {
+            device.RenderState.FogEnable = true;
+            device.RenderState.FogColor = color;
+            device.RenderState.FogTableMode = FogMode.Linear;
+            device.RenderState.FogStart = start;
+            device.RenderState.FogEnd = end;
         }
 
         private void RenderUI(Device d3dDevice)
