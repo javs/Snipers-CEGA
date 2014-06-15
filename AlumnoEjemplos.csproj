@@ -88,6 +88,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CEGA\Scenes\SimpleTerrain.cs" />
+    <Compile Include="CEGA\Scenes\VideoScene.cs" />
     <Compile Include="CEGA\Units\ColisionesAdmin.cs" />
     <Compile Include="CEGA\Units\Enemigo.cs" />
     <Compile Include="CEGA\Units\EnemigosAdmin.cs" />

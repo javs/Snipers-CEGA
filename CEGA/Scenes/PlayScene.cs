@@ -179,6 +179,7 @@ namespace AlumnoEjemplos.CEGA.Scenes
             //suelo.render();
             skyBox.render();
             heightMap.render();
+
             if ((bool)GuiController.Instance.Modifiers.getValue("showBB"))
                 heightMap.BoundingBox.render();
 
@@ -197,15 +198,19 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
                 if (mesh.Enabled)
                 {
+                    // Tres curvas distintas en diferentes etapas, para mayor realismo
                     if (i % 3 == 0)
                         treeWindEffect.SetValue("wind_wave", wind_wave_1);
                     else if (i % 2 == 0)
                         treeWindEffect.SetValue("wind_wave", wind_wave_2);
                     else
                         treeWindEffect.SetValue("wind_wave", wind_wave_3);
+
                     mesh.render();
+
                     if ((bool)GuiController.Instance.Modifiers.getValue("showBB"))
                         mesh.BoundingBox.render();
+
                     mesh.Enabled = false;
                 }
                 

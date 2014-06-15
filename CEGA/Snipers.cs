@@ -7,6 +7,7 @@ using TgcViewer.Utils;
 using TgcViewer.Utils.Shaders;
 using AlumnoEjemplos.CEGA.Units;
 using AlumnoEjemplos.CEGA.Scenes;
+using TgcViewer.Utils.TgcGeometry;
 
 namespace AlumnoEjemplos.CEGA
 {
@@ -51,6 +52,11 @@ namespace AlumnoEjemplos.CEGA
         Surface preDepthStencil;
         Texture preTargetTexture;
 
+        int stabilize = 3;
+
+        // hack: manejo de escenas
+        VideoScene video;
+
         /// <summary>
         /// Define el estado de los efectos de post-procesamiento.
         /// </summary>
@@ -85,6 +91,10 @@ namespace AlumnoEjemplos.CEGA
             GuiController.Instance.Modifiers.addBoolean("showBB", "Mostrar BoundingBoxes", false);
             GuiController.Instance.Modifiers.addBoolean("showQuadTree", "Mostrar QuadTree", false);
 
+            video = new VideoScene(GuiController.Instance.AlumnoEjemplosMediaDir + @"Video\CEGA",
+                "jpg", 24.0f, 196);
+
+            video.Playing = true;
         }
 
         private void SetupPostProcessing()
@@ -95,12 +105,12 @@ namespace AlumnoEjemplos.CEGA
 
             // Define un quad que cubre toda la pantalla, para hacer post-procesamiento
             CustomVertex.PositionTextured[] screenVertices = new CustomVertex.PositionTextured[]
-		    {
-    			new CustomVertex.PositionTextured(-1, 1, 1, 0, 0), 
-			    new CustomVertex.PositionTextured( 1, 1, 1, 1, 0),
-			    new CustomVertex.PositionTextured(-1,-1, 1, 0, 1),
-			    new CustomVertex.PositionTextured( 1,-1, 1, 1, 1)
-    		};
+            {
+                new CustomVertex.PositionTextured(-1, 1, 1, 0, 0), 
+                new CustomVertex.PositionTextured( 1, 1, 1, 1, 0),
+                new CustomVertex.PositionTextured(-1,-1, 1, 0, 1),
+                new CustomVertex.PositionTextured( 1,-1, 1, 1, 1)
+            };
 
             vbPostProcessMesh = new VertexBuffer(
                 typeof(CustomVertex.PositionTextured), 4, d3dDevice, Usage.Dynamic | Usage.WriteOnly,
@@ -133,9 +143,12 @@ namespace AlumnoEjemplos.CEGA
         /// 
         public override void render(float elapsedTime)
         {
-            playScene.Update(elapsedTime);
-            player.Update(elapsedTime);
-            enemigosAdmin.Update(elapsedTime);
+            // El tiempo avanza durante la carga, estabilizarlo por tres frames.
+            if (stabilize > 0)
+            {
+                stabilize--;
+                return;
+            }
 
             Device d3dDevice = GuiController.Instance.D3dDevice;
 
@@ -143,13 +156,25 @@ namespace AlumnoEjemplos.CEGA
             //
             Surface postTarget = d3dDevice.GetRenderTarget(0);
             Surface postDepthStencil = d3dDevice.DepthStencilSurface;
-            Surface preTarget  = preTargetTexture.GetSurfaceLevel(0);
+            Surface preTarget = preTargetTexture.GetSurfaceLevel(0);
+
+            // hack: scene management
+            if (video.Playing)
+            {
+                video.Update(elapsedTime);
+            }
+            else
+            {
+                playScene.Update(elapsedTime);
+                player.Update(elapsedTime);
+                enemigosAdmin.Update(elapsedTime);
+            }
 
             d3dDevice.SetRenderTarget(0, preTarget);
             d3dDevice.DepthStencilSurface = preDepthStencil;
 
             d3dDevice.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
-
+            
             RenderScene(d3dDevice);
 
             preTarget.Dispose();
@@ -174,6 +199,9 @@ namespace AlumnoEjemplos.CEGA
         {
             playScene.RenderUI(this);
             player.RenderUI(this);
+
+            if (video.Playing)
+                video.RenderUI(this);
         }
 
         /// <summary>
