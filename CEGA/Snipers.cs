@@ -64,6 +64,7 @@ namespace AlumnoEjemplos.CEGA
         public struct PostProcessEffects
         {
             public bool LensDistortion;
+            public float LensRadius;
         };
 
         public PostProcessEffects PostProcessing;
@@ -88,6 +89,8 @@ namespace AlumnoEjemplos.CEGA
             enemigosAdmin = new EnemigosAdmin(playScene);
 
             PostProcessing = new PostProcessEffects();
+            PostProcessing.LensDistortion = false;
+            PostProcessing.LensRadius = 0.3f;
 
             ColisionesAdmin.Instance.jugador = player;
             ColisionesAdmin.Instance.escenario = playScene;
@@ -238,7 +241,17 @@ namespace AlumnoEjemplos.CEGA
 
             // \TODO JJ: multiples efectos
             if (PostProcessing.LensDistortion)
+            {
                 postProcessEffect.Technique = "LensDistortion";
+                postProcessEffect.SetValue("lens_radius", PostProcessing.LensRadius);
+
+                Size screen = GuiController.Instance.Panel3d.Size;
+
+                postProcessEffect.SetValue("screen_w", screen.Width);
+                postProcessEffect.SetValue("screen_h", screen.Height);
+                postProcessEffect.SetValue("screen_center_x", screen.Width / 2);
+                postProcessEffect.SetValue("screen_center_y", screen.Height / 2);
+            }
             else
                 postProcessEffect.Technique = "NoEffect";
 

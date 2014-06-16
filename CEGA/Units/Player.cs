@@ -59,6 +59,8 @@ namespace AlumnoEjemplos.CEGA.Units
 
         Vector3 rebote = new Vector3(0, 0, 0);
 
+        float scope_radius;
+
         #region Constants
         const int zoomMaximo = 3;
         const float zoomWheel = 1.2F;
@@ -103,18 +105,23 @@ namespace AlumnoEjemplos.CEGA.Units
             // Configuracion del stencil para el modo scope
             //
             scope_stencil = new TgcSprite();
-            scope_stencil.Texture = TgcTexture.createTexture(media + @"Textures\scope_hi.png");
+            scope_stencil.Texture = TgcTexture.createTexture(media + @"Textures\scope.png");
 
             Size screenSize = GuiController.Instance.Panel3d.Size;
             Size textureSize = scope_stencil.Texture.Size;
 
-            scope_stencil.Scaling = new Vector2(
+            float scope_scale = FastMath.Min(
                 (float)screenSize.Width / textureSize.Width,
-                (float)screenSize.Height / textureSize.Height);
+                (float)screenSize.Height / textureSize.Height) * 0.9f;
+
+            scope_stencil.Scaling = new Vector2(scope_scale, scope_scale);
 
             scope_stencil.Position = new Vector2(
-                FastMath.Max(screenSize.Width / 2 - textureSize.Width * scope_stencil.Scaling.X / 2, 0),
-                FastMath.Max(screenSize.Height / 2 - textureSize.Height * scope_stencil.Scaling.Y / 2, 0));
+                FastMath.Max(screenSize.Width / 2 - textureSize.Width * scope_scale / 2, 0),
+                FastMath.Max(screenSize.Height / 2 - textureSize.Height * scope_scale / 2, 0));
+
+            // El radio, ajustado a -1% para cubrir el borde
+            scope_radius = (textureSize.Height * scope_scale / 2.0f) * 0.99f;
 
             LoadSounds(media);
 
@@ -125,10 +132,14 @@ namespace AlumnoEjemplos.CEGA.Units
             this.puntos = 0;
 
             //Configuracion de la mira sin scope.
+            float mira_scale = 0.08f;
             mira = new TgcSprite();
             mira.Texture = TgcTexture.createTexture(GuiController.Instance.AlumnoEjemplosMediaDir + "\\Textures\\Mira.png");
+            mira.Scaling = new Vector2(mira_scale, mira_scale);
 
             Size miraSize = mira.Texture.Size;
+            miraSize.Height = (int)(miraSize.Height * mira_scale);
+            miraSize.Width = (int)(miraSize.Width * mira_scale);
             mira.Position = new Vector2(FastMath.Max(screenSize.Width / 2 - miraSize.Width / 2, 0), FastMath.Max(screenSize.Height / 2 - miraSize.Height / 2, 0));
 
             //Inicialización UI (Texto)
@@ -181,9 +192,6 @@ namespace AlumnoEjemplos.CEGA.Units
             tpuntos.Position = new Point(screenSize.Width - 250, 0);
             tpuntos.Size = new Size(300, 100);
             tpuntos.changeFont(new System.Drawing.Font("TimesNewRoman", 22, FontStyle.Bold));
-
-
-
         }
 
          private float RifleCurvaMovimiento(float x)
@@ -201,7 +209,6 @@ namespace AlumnoEjemplos.CEGA.Units
              if (f < 0)
                  f = 0;
              return f;
-             
          }
 
         public void Update(float elapsedTime)
@@ -378,6 +385,7 @@ namespace AlumnoEjemplos.CEGA.Units
                 rifle.render();
 
             scene.PostProcessing.LensDistortion = scope;
+            scene.PostProcessing.LensRadius = scope_radius;
         }
 
         public void RenderUI(Snipers scene)

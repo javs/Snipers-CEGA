@@ -14,8 +14,14 @@ struct VS_OUTPUT_DEFAULT
 	float2 Texcoord : TEXCOORD0;
 };
 
+float lens_radius = 80.0f;
+float screen_w = 100.0f;
+float screen_h = 100.0f;
 
-VS_OUTPUT_DEFAULT vs_noeffect(VS_INPUT_DEFAULT Input)
+float screen_center_x = 50.0f;
+float screen_center_y = 50.0f;
+
+VS_OUTPUT_DEFAULT vs_postprocess(VS_INPUT_DEFAULT Input)
 {
 	VS_OUTPUT_DEFAULT Output;
 
@@ -68,37 +74,51 @@ float4 ps_lens_simple(float2 tex : TEXCOORD0) : COLOR0
 */
 float4 ps_lens_distortion(float2 tex : TEXCOORD0) : COLOR0
 {
-	// lens distortion coefficient
-	float k = 2.0f;
+	float4 finalColor;
 
-	// cubic distortion value
-	float kcube = 2.0f;
+	float2 pos = float2(tex.x * screen_w, tex.y * screen_h);
 
-
-	float r2 = (tex.x - 0.5) * (tex.x - 0.5) + (tex.y - 0.5) * (tex.y - 0.5);
-	float f = 0;
-
-
-	//only compute the cubic distortion if necessary 
-	if (kcube == 0.0){
-		f = 1 + r2 * k;
+	// jj: marco negro
+	if (distance(pos, float2(screen_center_x, screen_center_y)) > lens_radius)
+	{
+		finalColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
 	}
-	else{
-		f = 1 + r2 * (k + kcube * sqrt(r2));
-	};
+	else
+	{
+		// lens distortion coefficient
+		float k = 2.0f;
 
-	// get the right pixel for the current position
-	float x = f*(tex.x - 0.5) + 0.5;
-	float y = f*(tex.y - 0.5) + 0.5;
+		// cubic distortion value
+		float kcube = 2.0f;
 
-	// jj: chromatic aberration. crea minimas variaciones en cada canal de color,
-	// que son distintas entre si.
-	float3 inputDistordR = tex2D(pre_render_sampler, float2(x, y) + 0.0004f);
-	float3 inputDistordG = tex2D(pre_render_sampler, float2(x, y) - 0.0004f);
-	float3 inputDistordB = tex2D(pre_render_sampler, float2(x, y - 0.005f));
 
-	// jj: tinte azul
-	return float4(inputDistordR.r, inputDistordG.g, inputDistordB.b + 0.02f, 1);
+		float r2 = (tex.x - 0.5) * (tex.x - 0.5) + (tex.y - 0.5) * (tex.y - 0.5);
+		float f = 0;
+
+
+		//only compute the cubic distortion if necessary 
+		if (kcube == 0.0){
+			f = 1 + r2 * k;
+		}
+		else{
+			f = 1 + r2 * (k + kcube * sqrt(r2));
+		};
+
+		// get the right pixel for the current position
+		float x = f*(tex.x - 0.5) + 0.5;
+		float y = f*(tex.y - 0.5) + 0.5;
+
+		// jj: chromatic aberration. crea minimas variaciones en cada canal de color,
+		// que son distintas entre si.
+		float3 inputDistordR = tex2D(pre_render_sampler, float2(x, y) + 0.0004f);
+		float3 inputDistordG = tex2D(pre_render_sampler, float2(x, y) - 0.0004f);
+		float3 inputDistordB = tex2D(pre_render_sampler, float2(x, y - 0.005f));
+
+		// jj: tinte azul
+		finalColor = float4(inputDistordR.r, inputDistordG.g, inputDistordB.b + 0.02f, 1);
+	}
+
+	return finalColor;
 }
 
 
@@ -106,17 +126,8 @@ technique NoEffect
 {
 	pass Pass_0
 	{
-		VertexShader = compile vs_3_0 vs_noeffect();
+		VertexShader = compile vs_3_0 vs_postprocess();
 		PixelShader = compile ps_3_0 ps_noeffect();
-	}
-}
-
-technique LensSimple
-{
-	pass Pass_0
-	{
-		VertexShader = compile vs_3_0 vs_noeffect();
-		PixelShader = compile ps_3_0 ps_lens_simple();
 	}
 }
 
@@ -124,7 +135,7 @@ technique LensDistortion
 {
 	pass Pass_0
 	{
-		VertexShader = compile vs_3_0 vs_noeffect();
+		VertexShader = compile vs_3_0 vs_postprocess();
 		PixelShader  = compile ps_3_0 ps_lens_distortion();
 	}
 }
