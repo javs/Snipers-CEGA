@@ -102,6 +102,7 @@ namespace AlumnoEjemplos.CEGA.Scenes
                         BarrilInstance.move(j * offset, 0, i * offset);
                         BarrilInstance.AlphaBlendEnable = true;
                         BarrilInstance.Scale = new Vector3(0.09f, 0.09f, 0.09f);
+                        BarrilInstance.UserProperties = new Dictionary<string, string>();
 
                         otrosObjetos.Add(BarrilInstance);
                     }
@@ -114,6 +115,8 @@ namespace AlumnoEjemplos.CEGA.Scenes
                     instance.AlphaBlendEnable = true;
 
                     instance.Scale = new Vector3(0.05f * (scale), 0.05f * (scale), 0.05f * (scale));
+
+                    instance.UserProperties = new Dictionary<string, string>();
 
 
 
@@ -278,11 +281,12 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
         public void BorrarObjeto(string nombre)
         {
-            for (int i = 0; i < this.ObjetosConColision().Capacity; i++)
+            for (int i = 0; i < this.ObjetosConColision().Count; i++)
             {
                 if (this.ObjetosConColision()[i].Name == nombre)
                 {
                     this.ObjetosConColision()[i].dispose();
+                    this.grilla.BorrarModelo(this.ObjetosConColision()[i]);
                     this.ObjetosConColision().RemoveAt(i);
                     break;
                 }

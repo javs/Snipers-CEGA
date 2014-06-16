@@ -93,7 +93,6 @@ namespace AlumnoEjemplos.CEGA.Units
                     float d, xc, zc;
                     xc = barril.Position.X;
                     zc = barril.Position.Z;
-                    List<uint> enemigosMuertos = new List<uint>();
 
                     var listaDeEnemigos = enemigos.ListaDeEnemigos();
 

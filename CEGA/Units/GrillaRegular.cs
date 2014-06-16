@@ -77,7 +77,7 @@ namespace AlumnoEjemplos.CEGA.Units
 
                         //Cargar modelos en celda
                         node.Models = new List<TgcMesh>();
-                        addModelsToCell(node, modelos);
+                        addModelsToCell(node, modelos, new Vector3(x,y,z));
 
                         grid[x, y, z] = node;
                     }
@@ -90,13 +90,20 @@ namespace AlumnoEjemplos.CEGA.Units
         /// <summary>
         /// Agregar modelos a una celda
         /// </summary>
-        private void addModelsToCell(GrillaRegularNode node, List<TgcMesh> modelos)
+        private void addModelsToCell(GrillaRegularNode node, List<TgcMesh> modelos, Vector3 posicion)
         {
             foreach (TgcMesh mesh in modelos)
             {
                 if (TgcCollisionUtils.testAABBAABB(node.BoundingBox, mesh.BoundingBox))
                 {
                     node.Models.Add(mesh);
+                    string gid = posicion.X.ToString()
+                        + "." + posicion.Y.ToString() 
+                        + "." + posicion.Z.ToString();
+                    if (mesh.UserProperties.ContainsKey("gid") == true)
+                        mesh.UserProperties["gid"] = mesh.UserProperties["gid"] + "+" + gid;
+                    else
+                        mesh.UserProperties.Add("gid", gid);
                 }
             }
         }
@@ -170,6 +177,33 @@ namespace AlumnoEjemplos.CEGA.Units
             }
 
             return listaDeNodos;
+        }
+
+        public void BorrarModelo(TgcMesh modelo)
+        {
+            string[] grillas;
+            string[] posicion;
+            int x;
+            int y;
+            int z;
+
+            grillas = modelo.UserProperties["gid"].Split('+');
+
+            foreach (string grilla in grillas)
+            {
+                posicion = grilla.Split('.');
+                x = Convert.ToInt32(posicion[0]);
+                y = Convert.ToInt32(posicion[1]);
+                z = Convert.ToInt32(posicion[2]);
+
+                GrillaRegularNode nodo = grid[x, y, z];
+
+                for (int i = 0; i < nodo.Models.Count; i++)
+                {
+                    if (nodo.Models[i] == modelo)
+                        nodo.Models.RemoveAt(i);
+                }
+            }
         }
 
         /// <summary>
