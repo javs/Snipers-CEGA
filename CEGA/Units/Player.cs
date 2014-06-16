@@ -35,6 +35,7 @@ namespace AlumnoEjemplos.CEGA.Units
         TgcStaticSound sound_Zoom;
         TgcStaticSound sound_Disparo;
         TgcStaticSound sound_DryFire;
+        TgcStaticSound sound_Die;
          
         TgcStaticSound sound_Hit;
         //Podriamos hace que dependa de la respuesta del admin de colisiones para saber si fue headshot o un hit normal y reproducir sonidos distintos según cada cosa
@@ -164,6 +165,9 @@ namespace AlumnoEjemplos.CEGA.Units
             sound_Hit = new TgcStaticSound();
             sound_Hit.loadSound(media + @"Sound\hit.wav", -500);
 
+            sound_Die = new TgcStaticSound();
+            sound_Die.loadSound(media + @"Sound\die.wav", -500);
+
             camera.MovementSound = sound_Walk;
         }
         
@@ -246,6 +250,7 @@ namespace AlumnoEjemplos.CEGA.Units
             if ( ColisionesAdmin.Instance.ColisionConEnemigos() )
             {
                 this.vidas -= 1;
+                sound_Die.play();
                 camera.move(posicionInicial - camera.getPosition());
             }
 
@@ -416,6 +421,7 @@ namespace AlumnoEjemplos.CEGA.Units
             sound_Disparo.dispose();
             sound_DryFire.dispose();
             sound_Hit.dispose();
+            sound_Die.dispose();
             mira.dispose();
             tvidas.dispose();
             tammo.dispose();
