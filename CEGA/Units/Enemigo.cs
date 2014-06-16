@@ -25,7 +25,9 @@ namespace AlumnoEjemplos.CEGA.Units
         TgcBoundingSphere cabeza;
         float hp;
         Vector3 vectorNulo = new Vector3(0, 0, 0);
-        Vector3 direccionAnterior = new Vector3(0, 0, 0);
+        Vector3 direccionColisionObjeto = new Vector3(0, 0, 0);
+        Vector3 direccionColisionEnemigo = new Vector3(0, 0, 0);
+        Vector3 direccionRandom = new Vector3(0, 0, 0);
 
         bool muriendo;
 
@@ -108,49 +110,59 @@ namespace AlumnoEjemplos.CEGA.Units
 
             if (ColisionesAdmin.Instance.ColisionEnemigoConObjetos(this))
             {
-                if (direccionAnterior == vectorNulo)
+                if (direccionColisionObjeto == vectorNulo)
                 {
-                    angulo = (180 * (float)Math.Atan(direccionMovimiento.Z / direccionMovimiento.X)) / (float)Math.PI + 45;
+                    angulo = (180 * (float)Math.Atan2(direccionMovimiento.Z, direccionMovimiento.X)) / (float)Math.PI;// +45;
                     angulo += 90;
-                    if (angulo >= 360)
-                        angulo -= 360;
-
-                    if (angulo < 0)
-                        angulo += 360;
-                    direccionMovimiento = Rotar(angulo);
-                    direccionAnterior = direccionMovimiento;
+                    direccionColisionObjeto = Rotar(angulo);
                 }
             }
             else
             {
-                direccionAnterior = vectorNulo;
-            }
+                direccionColisionObjeto = vectorNulo;
 
-            if (this.colisionado == true)
-            {
-                if (direccionAnterior == vectorNulo)
+                if ( this.colisionado == true )
                 {
-                    direccionMovimiento.X += randomEnemigo.Next(50, 100);
-                    if (randomEnemigo.Next(0, 2) == 1)
-                        direccionMovimiento.X *= -1;
-                    direccionAnterior = direccionMovimiento;
+                    if (!ColisionesAdmin.Instance.ColisionEnemigoConEnemigos(this, out otroEnemigo))
+                    {
+                        this.colisionado = false;
+                        direccionColisionEnemigo = vectorNulo;
+                    }
+                    else if (direccionColisionEnemigo == vectorNulo)
+                    {
+                        angulo = (180 * (float)Math.Atan2(direccionMovimiento.Z, direccionMovimiento.X)) / (float)Math.PI;// +45;
+                        int anguloGiro = randomEnemigo.Next(45,90);
+                        if (randomEnemigo.Next(0, 2) == 1)
+                            anguloGiro *= -1;
+                        angulo += anguloGiro;
+                        direccionColisionEnemigo = Rotar(angulo);
+                    }
                 }
-
-                if (!ColisionesAdmin.Instance.ColisionEnemigoConEnemigos(this, out otroEnemigo))
+                else
                 {
-                    this.colisionado = false;
-                    direccionAnterior = vectorNulo;
+                    if (ColisionesAdmin.Instance.ColisionEnemigoConEnemigos(this, out otroEnemigo))
+                        otroEnemigo.colisionado = true;
+
+                    if (direccionRandom == vectorNulo && randomEnemigo.Next(0, 500) == 1)
+                    {
+                        angulo = (180 * (float)FastMath.Atan2(direccionMovimiento.Z, direccionMovimiento.X)) / (float)Math.PI;// +45;
+                        int anguloGiro = 30;
+                        if  (randomEnemigo.Next(0,2) == 1)
+                            anguloGiro = 90;
+                        angulo += anguloGiro;
+                        direccionRandom = Rotar(angulo);
+                    }
+                    else if (direccionRandom != vectorNulo && randomEnemigo.Next(0, 50) == 1)
+                        direccionRandom = vectorNulo;
                 }
-
-            }
-            else
-            {
-                if (ColisionesAdmin.Instance.ColisionEnemigoConEnemigos(this, out otroEnemigo))
-                    otroEnemigo.colisionado = true;
             }
 
-            if (direccionAnterior != vectorNulo)
-                direccionMovimiento = direccionAnterior;
+            if (direccionRandom != vectorNulo)
+                direccionMovimiento = direccionRandom;
+            if (direccionColisionEnemigo != vectorNulo)
+                direccionMovimiento = direccionColisionEnemigo;
+            if (direccionColisionObjeto != vectorNulo)
+                direccionMovimiento = direccionColisionObjeto;
 
             direccionMovimiento.Normalize();
 
@@ -172,6 +184,12 @@ namespace AlumnoEjemplos.CEGA.Units
             float x = 0;
             float y = 0;
             float z = 0;
+
+            if (angulo >= 360)
+                angulo -= 360;
+
+            if (angulo < 0)
+                angulo += 360;
 
             if (angulo < 180)
             {
