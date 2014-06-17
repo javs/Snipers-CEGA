@@ -108,6 +108,7 @@ namespace AlumnoEjemplos.CEGA.Scenes
                         BarrilInstance.AlphaBlendEnable = true;
                         BarrilInstance.Scale = new Vector3(0.09f, 0.09f, 0.09f);
                         BarrilInstance.UserProperties = new Dictionary<string, string>();
+                        BarrilInstance.UserProperties["colisionable"] = "";
 
                         otrosObjetos.Add(BarrilInstance);
                     }
@@ -119,6 +120,7 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
                     instance.Scale = new Vector3(0.05f * (scale), 0.05f * (scale), 0.05f * (scale));
                     instance.UserProperties = new Dictionary<string, string>();
+                    instance.UserProperties["colisionable"] = "";
 
                     //Modifico el BB del arbol para que sea solo el tronco
                     instance.AutoUpdateBoundingBox = false;
@@ -261,7 +263,14 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
         public List<TgcMesh> ObjetosConColision()
         {
-            return otrosObjetos;
+            List<TgcMesh> listaObjetos = new List<TgcMesh>();
+            foreach (TgcMesh objeto in otrosObjetos)
+            {
+                if (objeto.UserProperties.ContainsKey("colisionable"))
+                    listaObjetos.Add(objeto);
+            }
+
+            return listaObjetos;
         }
 
         public List<TgcMesh> ObjetosConColisionCerca(TgcBoundingBox bb)
@@ -272,7 +281,8 @@ namespace AlumnoEjemplos.CEGA.Scenes
             {
                 foreach (TgcMesh objeto in nodo.Models)
                 {
-                    listaObjetos.Add(objeto);
+                    if (objeto.UserProperties.ContainsKey("colisionable"))
+                        listaObjetos.Add(objeto);
                 }
             }
 
@@ -325,13 +335,13 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
         public void BorrarObjeto(string nombre)
         {
-            for (int i = 0; i < this.ObjetosConColision().Count; i++)
+            for (int i = 0; i < otrosObjetos.Count; i++)
             {
-                if (this.ObjetosConColision()[i].Name == nombre)
+                if (otrosObjetos[i].Name == nombre)
                 {
-                    this.ObjetosConColision()[i].dispose();
-                    this.grilla.BorrarModelo(this.ObjetosConColision()[i]);
-                    this.ObjetosConColision().RemoveAt(i);
+                    otrosObjetos[i].dispose();
+                    grilla.BorrarModelo(otrosObjetos[i]);
+                    otrosObjetos.RemoveAt(i);
                     break;
                 }
             }
