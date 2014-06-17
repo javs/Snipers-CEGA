@@ -125,7 +125,7 @@ namespace AlumnoEjemplos.CEGA.Scenes
                     instance.BoundingBox.scaleTranslate(instance.Position, new Vector3(0.0012f * instance.BoundingBox.calculateSize().X, 0.0016f * instance.BoundingBox.calculateSize().Y, 0.0012f * instance.BoundingBox.calculateSize().Z));
                     //Effecto de Viento (Shader);
                     instance.Effect = treeWindEffect;
-                    instance.Technique = "SimpleWind";
+                    instance.Technique = "SimpleWindTree";
                     //Agrego a la coleccion
                     otrosObjetos.Add(instance);
 
@@ -281,9 +281,6 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
         private void generarBancoPasto(List<TgcMesh> objs, Vector3 pos , Random rdm)
         {
-            float bbPastoAnteriorX = 0;
-            float bbPastoAnteriorZ = 0;
-            
             for (int q = 0; q < 1; q++)
             {
                 for (int w = 0; w < 1; w++)
@@ -295,7 +292,8 @@ namespace AlumnoEjemplos.CEGA.Scenes
                     pastoBanco.Scale = new Vector3(0.025f * scale, 0.025f * scale, 0.025f * scale);
                     pastoBanco.move(pos.X + q*2.6f, 0, pos.Z + w *2.6f);
                     pastoBanco.UserProperties = new Dictionary<string, string>();
-                                        
+                    pastoBanco.Effect = treeWindEffect;
+                    pastoBanco.Technique = "SimpleWindGrass";
                     objs.Add(pastoBanco);
 
                 }

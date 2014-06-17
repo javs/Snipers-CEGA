@@ -40,7 +40,7 @@ struct PS_OUTPUT
 	//float Depth : DEPTH;
 };
 
-VS_OUTPUT_DEFAULT vs_simplewind(VS_INPUT_DEFAULT Input)
+VS_OUTPUT_DEFAULT vs_simplewindtree(VS_INPUT_DEFAULT Input)
 {
 	VS_OUTPUT_DEFAULT Output;
 
@@ -64,6 +64,32 @@ VS_OUTPUT_DEFAULT vs_simplewind(VS_INPUT_DEFAULT Input)
 	return Output;
 }
 
+VS_OUTPUT_DEFAULT vs_simplewindgrass(VS_INPUT_DEFAULT Input)
+{
+	VS_OUTPUT_DEFAULT Output;
+
+	// Ajusta el viento a la parte superior del arbol
+	//
+	float y_adjust = Input.Position.y;
+
+	
+	if (y_adjust < 0.0f)
+		y_adjust = 0.0f;
+
+	Input.Position.z += wind_wave * 0.1f * (y_adjust / 60.0f);
+	Input.Position.z += Input.Position.z * 0.1f * wind_wave;
+
+	Output.Position = mul(Input.Position, matWorldViewProj);
+	Output.Texcoord = Input.Texcoord;
+
+	// Calculo del factor de fog
+	float4 cameraPosition = mul(Input.Position, matWorldView);
+		Output.Fog = saturate((2500.0f - cameraPosition.z) / (2500.0f - 250.f));
+
+	return Output;
+}
+
+
 PS_OUTPUT ps_fog(float2 Texcoord : TEXCOORD0, float Fog : FOG)
 {
 	PS_OUTPUT Output;
@@ -85,11 +111,20 @@ PS_OUTPUT ps_fog(float2 Texcoord : TEXCOORD0, float Fog : FOG)
 	return Output;
 }
 
-technique SimpleWind
+technique SimpleWindTree
 {
 	pass Pass_0
 	{
-		VertexShader = compile vs_3_0 vs_simplewind();
+		VertexShader = compile vs_3_0 vs_simplewindtree();
+		PixelShader = compile ps_3_0 ps_fog();
+	}
+}
+
+technique SimpleWindGrass
+{
+	pass Pass_0
+	{
+		VertexShader = compile vs_3_0 vs_simplewindgrass();
 		PixelShader = compile ps_3_0 ps_fog();
 	}
 }
