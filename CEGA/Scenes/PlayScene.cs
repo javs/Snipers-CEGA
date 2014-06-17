@@ -22,6 +22,10 @@ namespace AlumnoEjemplos.CEGA.Scenes
         private TgcSkyBox skyBox;
         public SimpleTerrain heightMap;
 
+
+        public TgcMesh pastoOriginal;
+        int scale;
+
         List<TgcMesh> otrosObjetos;
 
         Effect treeWindEffect;
@@ -62,13 +66,13 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
             TgcSceneLoader loader = new TgcSceneLoader();
             TgcScene scene = loader.loadSceneFromFile(mediaDir + "\\Pino-TgcScene.xml");
-
-
-
             TgcMesh pinoOriginal = scene.Meshes[0];
-            scene = loader.loadSceneFromFile(mediaDir + "\\BarrilPolvora-TgcScene.xml");
 
+            scene = loader.loadSceneFromFile(mediaDir + "\\BarrilPolvora-TgcScene.xml");
             TgcMesh barrilOriginal = scene.Meshes[0];
+
+            scene = loader.loadSceneFromFile(mediaDir + "\\Pasto3-TgcScene.xml");
+            pastoOriginal = scene.Meshes[0];
 
             //Crear varias instancias del modelo original, pero sin volver a cargar el modelo entero cada vez, hace 23*23 = 529 pinos
             int rows = 23;
@@ -88,14 +92,15 @@ namespace AlumnoEjemplos.CEGA.Scenes
                     //Si les parece que quedan muy concentrados en el origen podemos separarlo en 2 For (o en 4) para que no se peguen tanto cuando i=1 y j=1.
 
                     offset = RandomPlayScene.Next(50, 150);
-                    int scale = RandomPlayScene.Next(10, 30);
+                    scale = RandomPlayScene.Next(10, 30);
 
                     //Me fijo que quede dentro de los limites del mapa
 
                     if (i * offset > 2600 || j * offset > 2600)
                         offset = RandomPlayScene.Next(10, 100);
 
-                    //Crear instancia de modelo
+                    //Crear instancia de modelo 
+                    //  Barriles
                     if (i == 23)
                     {
                         TgcMesh BarrilInstance = barrilOriginal.createMeshInstance(barrilOriginal.Name + i + j);
@@ -106,30 +111,43 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
                         otrosObjetos.Add(BarrilInstance);
                     }
-
+                    //  Pinos
                     TgcMesh instance = pinoOriginal.createMeshInstance(pinoOriginal.Name + i + "_" + j);
-
-
                     //Desplazarlo
                     instance.move(i * offset, 0, j * offset);
                     instance.AlphaBlendEnable = true;
 
                     instance.Scale = new Vector3(0.05f * (scale), 0.05f * (scale), 0.05f * (scale));
-
                     instance.UserProperties = new Dictionary<string, string>();
-
-
 
                     //Modifico el BB del arbol para que sea solo el tronco
                     instance.AutoUpdateBoundingBox = false;
                     instance.BoundingBox.scaleTranslate(instance.Position, new Vector3(0.0012f * instance.BoundingBox.calculateSize().X, 0.0016f * instance.BoundingBox.calculateSize().Y, 0.0012f * instance.BoundingBox.calculateSize().Z));
-
-
+                    //Effecto de Viento (Shader);
                     instance.Effect = treeWindEffect;
                     instance.Technique = "SimpleWind";
-
-
+                    //Agrego a la coleccion
                     otrosObjetos.Add(instance);
+
+                    //  Bancos de Pasto
+                    //for (int k = 1; k < 12; k++)
+                    //{
+                    //    TgcMesh pastoBanco = pastoOriginal.createMeshInstance(pastoOriginal.Name + i + j + k);
+                    //    pastoBanco.AlphaBlendEnable = true;
+                    //    pastoBanco.Scale = new Vector3(0.002f * scale, 0.002f * scale, 0.002f * scale);
+                    //    pastoBanco.move((j * offset) + bbPastoAnteriorX / 2, 0, i*offset + bbPastoAnteriorZ / 2);
+                    //    pastoBanco.UserProperties = new Dictionary<string, string>();
+
+                    //    bbPastoAnteriorZ = pastoBanco.BoundingBox.calculateSize().Z;
+                    //    bbPastoAnteriorX = pastoBanco.BoundingBox.calculateSize().X;
+
+                    //    otrosObjetos.Add(pastoBanco);
+
+                    //}
+                    if ( j > 21)
+                    generarBancoPasto(otrosObjetos, new Vector3(j * offset, 0, i * offset), RandomPlayScene);
+
+
                 }
 
 
@@ -260,6 +278,32 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
             return listaObjetos;
         }
+
+        private void generarBancoPasto(List<TgcMesh> objs, Vector3 pos , Random rdm)
+        {
+            float bbPastoAnteriorX = 0;
+            float bbPastoAnteriorZ = 0;
+            
+            for (int q = 0; q < 1; q++)
+            {
+                for (int w = 0; w < 1; w++)
+                {
+                    scale = rdm.Next(10, 20);
+                    
+                    TgcMesh pastoBanco = pastoOriginal.createMeshInstance(pastoOriginal.Name + q + w + pos.X + pos.Z);
+                    pastoBanco.AlphaBlendEnable = true;
+                    pastoBanco.Scale = new Vector3(0.025f * scale, 0.025f * scale, 0.025f * scale);
+                    pastoBanco.move(pos.X + q*2.6f, 0, pos.Z + w *2.6f);
+                    pastoBanco.UserProperties = new Dictionary<string, string>();
+                                        
+                    objs.Add(pastoBanco);
+
+                }
+
+            }
+
+        }
+
 
         public GrillaRegular Grilla()
         {
