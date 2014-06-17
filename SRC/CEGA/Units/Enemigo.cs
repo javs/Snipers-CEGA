@@ -72,7 +72,7 @@ namespace AlumnoEjemplos.CEGA.Units
                     GuiController.Instance.ExamplesMediaDir + "SkeletalAnimations\\BasicHuman\\Animations\\" + "Walk-TgcSkeletalAnim.xml",
                     GuiController.Instance.ExamplesMediaDir + "SkeletalAnimations\\BasicHuman\\Animations\\" + "StandBy-TgcSkeletalAnim.xml",
                     GuiController.Instance.ExamplesMediaDir + "SkeletalAnimations\\BasicHuman\\Animations\\" + "Run-TgcSkeletalAnim.xml",
-                    GuiController.Instance.AlumnoEjemplosMediaDir + "Animations\\" + "Death-TgcSkeletalAnim.xml",
+                    GuiController.Instance.AlumnoEjemplosMediaDir + "CEGA\\Animations\\" + "Death-TgcSkeletalAnim.xml",
                 });
 
 
