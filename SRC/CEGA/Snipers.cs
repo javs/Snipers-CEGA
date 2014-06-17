@@ -102,7 +102,7 @@ namespace AlumnoEjemplos.CEGA
             GuiController.Instance.Modifiers.addBoolean("showBB", "Mostrar BoundingBoxes", false);
             GuiController.Instance.Modifiers.addBoolean("showGrilla", "Mostrar Grilla", false);
 
-            video = new VideoScene(GuiController.Instance.AlumnoEjemplosMediaDir + @"Video\CEGA",
+            video = new VideoScene(GuiController.Instance.AlumnoEjemplosMediaDir + @"CEGA\Video\CEGA",
                 "jpg", 24.0f, 196);
 
             video.Playing = true;
@@ -141,7 +141,7 @@ namespace AlumnoEjemplos.CEGA
                 DepthFormat.D24S8, MultiSampleType.None, 0, true);
 
             postProcessEffect = TgcShaders.loadEffect(
-                GuiController.Instance.AlumnoEjemplosMediaDir + "Shaders\\PostProcess.fx");
+                GuiController.Instance.AlumnoEjemplosMediaDir + "CEGA\\Shaders\\PostProcess.fx");
         }
 
 
@@ -195,7 +195,7 @@ namespace AlumnoEjemplos.CEGA
             d3dDevice.RenderState.FogEnable = false;
 
             // para debugear:
-            //TextureLoader.Save(GuiController.Instance.AlumnoEjemplosMediaDir + "Shaders\\render_target.bmp",
+            //TextureLoader.Save(GuiController.Instance.AlumnoEjemplosMediaDir + "CEGA\\Shaders\\render_target.bmp",
             //                      ImageFileFormat.Bmp, preTargetTexture);
 
             // Render al post target

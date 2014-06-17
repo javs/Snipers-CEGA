@@ -50,28 +50,28 @@ namespace AlumnoEjemplos.CEGA.Scenes
             string mediaDir = GuiController.Instance.AlumnoEjemplosMediaDir;
 
             TgcTexture pisoTexture = TgcTexture.createTexture(GuiController.Instance.D3dDevice,
-                 mediaDir + "Textures\\Grass.jpg");
+                 mediaDir + "CEGA\\Textures\\Grass.jpg");
 
             suelo = TgcBox.fromSize(new Vector3(1300, 0, 1300), new Vector3(2800, 0, 2800), pisoTexture);
 
 
             heightMap = new SimpleTerrain();
 
-            heightMap.loadHeightmap(GuiController.Instance.AlumnoEjemplosMediaDir + "Heightmap\\" + "hmap4.jpg", 26, 0.4f, new Vector3(52, 0, 48));
-            heightMap.loadTexture(GuiController.Instance.AlumnoEjemplosMediaDir + "Textures\\" + "grass2.jpg");
+            heightMap.loadHeightmap(GuiController.Instance.AlumnoEjemplosMediaDir + "CEGA\\Heightmap\\" + "hmap4.jpg", 26, 0.4f, new Vector3(52, 0, 48));
+            heightMap.loadTexture(GuiController.Instance.AlumnoEjemplosMediaDir + "CEGA\\Textures\\" + "grass2.jpg");
 
 
             treeWindEffect = TgcShaders.loadEffect(
-                GuiController.Instance.AlumnoEjemplosMediaDir + "Shaders\\TreeWind.fx");
+                GuiController.Instance.AlumnoEjemplosMediaDir + "CEGA\\Shaders\\TreeWind.fx");
 
             TgcSceneLoader loader = new TgcSceneLoader();
-            TgcScene scene = loader.loadSceneFromFile(mediaDir + "\\Pino-TgcScene.xml");
+            TgcScene scene = loader.loadSceneFromFile(mediaDir + "CEGA\\Pino-TgcScene.xml");
             TgcMesh pinoOriginal = scene.Meshes[0];
 
-            scene = loader.loadSceneFromFile(mediaDir + "\\BarrilPolvora-TgcScene.xml");
+            scene = loader.loadSceneFromFile(mediaDir + "CEGA\\BarrilPolvora-TgcScene.xml");
             TgcMesh barrilOriginal = scene.Meshes[0];
 
-            scene = loader.loadSceneFromFile(mediaDir + "\\Pasto3-TgcScene.xml");
+            scene = loader.loadSceneFromFile(mediaDir + "CEGA\\Pasto3-TgcScene.xml");
             pastoOriginal = scene.Meshes[0];
 
             //Crear varias instancias del modelo original, pero sin volver a cargar el modelo entero cada vez, hace 23*23 = 529 pinos
@@ -155,7 +155,7 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
             //Sky Box
 
-            string texturesPath = mediaDir + "Skyboxes\\SkyBox4\\";
+            string texturesPath = mediaDir + "CEGA\\Skyboxes\\SkyBox4\\";
 
             //Creo el SkyBox 
             skyBox = new TgcSkyBox();
@@ -174,13 +174,13 @@ namespace AlumnoEjemplos.CEGA.Scenes
             skyBox.updateValues();
 
             sound_WindLong = new TgcStaticSound();
-            sound_WindLong.loadSound(mediaDir + @"Sound\viento_largo.wav", -2000);
+            sound_WindLong.loadSound(mediaDir + @"CEGA\Sound\viento_largo.wav", -2000);
 
             sound_WindMedium = new TgcStaticSound();
-            sound_WindMedium.loadSound(mediaDir + @"Sound\viento_medio.wav", -2000);
+            sound_WindMedium.loadSound(mediaDir + @"CEGA\Sound\viento_medio.wav", -2000);
 
             sound_music = new TgcStaticSound();
-            sound_music.loadSound(mediaDir + @"Sound\rabbia.wav", -2000);
+            sound_music.loadSound(mediaDir + @"CEGA\Sound\rabbia.wav", -2000);
             sound_music.play(true);
 
             //Crear Grilla
