@@ -13,11 +13,8 @@ namespace AlumnoEjemplos.CEGA.Units
     /// </summary>
     public class GrillaRegular
     {
-        //Tamaños de celda de la grilla
-        float CELL_WIDTH = 200;
-        float CELL_HEIGHT = 200;
-        float CELL_LENGTH = 200;
-
+        // Tamaños de celda de la grilla
+        readonly float CELL_SIZE = 200;
 
         List<TgcMesh> modelos;
         TgcBoundingBox sceneBounds;
@@ -39,7 +36,7 @@ namespace AlumnoEjemplos.CEGA.Units
             this.sceneBounds = sceneBounds;
 
             //build
-            grid = buildGrid(modelos, sceneBounds, new Vector3(CELL_WIDTH, CELL_HEIGHT, CELL_LENGTH));
+            grid = buildGrid(modelos, sceneBounds, new Vector3(CELL_SIZE, CELL_SIZE, CELL_SIZE));
 
             foreach (TgcMesh mesh in modelos)
             {
@@ -138,43 +135,19 @@ namespace AlumnoEjemplos.CEGA.Units
         public List<GrillaRegularNode> NodosCercanos(TgcBoundingBox bb)
         {
             List<GrillaRegularNode> listaDeNodos = new List<GrillaRegularNode>();
-            for (int x = 0; x < grid.GetUpperBound(0); x++)
-            {
-                for (int y = 0; y < grid.GetUpperBound(1); y++)
-                {
-                    for (int z = 0; z < grid.GetUpperBound(2); z++)
-                    {
-                        GrillaRegularNode node = grid[x, y, z];
-                        if (TgcCollisionUtils.testAABBAABB(bb, node.BoundingBox))
-                        {
-                            listaDeNodos.Add(node);
-                            if (x > 0)
-                            {
-                                listaDeNodos.Add(grid[x - 1, y, z]);
-                                if ( z > 0)
-                                    listaDeNodos.Add(grid[x - 1, y, z - 1]);
-                                if (z < grid.GetUpperBound(2) - 1)
-                                    listaDeNodos.Add(grid[x - 1, y, z + 1]);
-                            }
-                                
-                            if (x < grid.GetUpperBound(0) - 1)
-                            {
-                                listaDeNodos.Add(grid[x + 1, y, z]);
-                                if ( z < grid.GetUpperBound(2) - 1)
-                                    listaDeNodos.Add(grid[x + 1, y, z + 1]);
-                                if ( z > 0 )
-                                    listaDeNodos.Add(grid[x + 1, y, z - 1]);
-                            }
-                                
-                            if (z > 0)
-                                listaDeNodos.Add(grid[x, y, z - 1]);
-                            if (z < grid.GetUpperBound(2) - 1)
-                                listaDeNodos.Add(grid[x, y, z + 1]);
+            
+            int min_x = (int)((bb.PMin.X - sceneBounds.PMin.X) / CELL_SIZE);
+            int min_y = (int)((bb.PMin.Y - sceneBounds.PMin.Y) / CELL_SIZE);
+            int min_z = (int)((bb.PMin.Z - sceneBounds.PMin.Z) / CELL_SIZE);
 
-                        }
-                    }
-                }
-            }
+            int max_x = (int)((bb.PMax.X - sceneBounds.PMin.X) / CELL_SIZE);
+            int max_y = (int)((bb.PMax.Y - sceneBounds.PMin.Y) / CELL_SIZE);
+            int max_z = (int)((bb.PMax.Z - sceneBounds.PMin.Z) / CELL_SIZE);
+
+            listaDeNodos.Add(grid[min_x, min_y, min_z]);
+
+            if (min_x != max_x || min_y != max_y || min_z != max_z)
+                listaDeNodos.Add(grid[max_x, max_y, max_z]);
 
             return listaDeNodos;
         }

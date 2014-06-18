@@ -107,18 +107,34 @@ namespace AlumnoEjemplos.CEGA.Scenes
                         BarrilInstance.move(j * offset, 0, i * offset);
                         BarrilInstance.AlphaBlendEnable = true;
                         BarrilInstance.Scale = new Vector3(0.09f, 0.09f, 0.09f);
+
+                        // gana algunos fps
+                        BarrilInstance.AutoTransformEnable = false;
+                        BarrilInstance.Transform =
+                            Matrix.Scaling(BarrilInstance.Scale) *
+                            Matrix.Translation(BarrilInstance.Position);
+
                         BarrilInstance.UserProperties = new Dictionary<string, string>();
                         BarrilInstance.UserProperties["colisionable"] = "";
 
                         otrosObjetos.Add(BarrilInstance);
                     }
-                    //  Pinos
-                    TgcMesh instance = pinoOriginal.createMeshInstance(pinoOriginal.Name + i + "_" + j);
-                    //Desplazarlo
-                    instance.move(i * offset, 0, j * offset);
-                    instance.AlphaBlendEnable = true;
 
+                    //  Pinos
+                    //
+
+                    TgcMesh instance = pinoOriginal.createMeshInstance(pinoOriginal.Name + i + "_" + j);
+                    
+                    instance.AlphaBlendEnable = true;
+                    instance.Position = new Vector3(i * offset, 0, j * offset);
                     instance.Scale = new Vector3(0.05f * (scale), 0.05f * (scale), 0.05f * (scale));
+
+                    // gana algunos fps
+                    instance.AutoTransformEnable = false;
+                    instance.Transform =
+                        Matrix.Scaling(instance.Scale) *
+                        Matrix.Translation(instance.Position);
+
                     instance.UserProperties = new Dictionary<string, string>();
                     instance.UserProperties["colisionable"] = "";
 
@@ -289,6 +305,13 @@ namespace AlumnoEjemplos.CEGA.Scenes
                     pastoBanco.UserProperties = new Dictionary<string, string>();
                     pastoBanco.Effect = treeWindEffect;
                     pastoBanco.Technique = "SimpleWindGrass";
+
+                    // gana algunos fps
+                    pastoBanco.AutoTransformEnable = false;
+                    pastoBanco.Transform =
+                        Matrix.Scaling(pastoBanco.Scale) *
+                        Matrix.Translation(pastoBanco.Position);
+
                     objs.Add(pastoBanco);
 
                 }
@@ -338,7 +361,7 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
             wind_wave_1 = WindCurve(x);
             wind_wave_2 = WindCurve(x + 1.0f);
-            wind_wave_3 = WindCurve(x + 1.5f);
+            wind_wave_3 = WindCurve(x + 3.5f);
 
             if (FastMath.Abs(wind_wave_1) > 0.3f)
                 sound_WindLong.play();
@@ -348,7 +371,7 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
         private float WindCurve(float x)
         {
-            // Curva de viento para arboles, basada en el Crysis.
+            // Curva de viento para arboles, basada en el libro de GPU Gems.
             return
                 FastMath.Cos(x * FastMath.PI) *
                 FastMath.Cos(x * 3.0f * FastMath.PI) *
