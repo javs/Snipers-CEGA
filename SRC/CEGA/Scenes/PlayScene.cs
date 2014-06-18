@@ -34,6 +34,7 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
         TgcStaticSound sound_WindLong;
         TgcStaticSound sound_WindMedium;
+        TgcStaticSound sound_WindLeaves;
         TgcStaticSound sound_music;
 
         float time = 0.0f;
@@ -48,6 +49,7 @@ namespace AlumnoEjemplos.CEGA.Scenes
         {
 
             string mediaDir = GuiController.Instance.AlumnoEjemplosMediaDir;
+            string examplesMediaDir = GuiController.Instance.ExamplesMediaDir;
 
             TgcTexture pisoTexture = TgcTexture.createTexture(GuiController.Instance.D3dDevice,
                  mediaDir + "CEGA\\Textures\\Grass.jpg");
@@ -181,6 +183,9 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
             sound_WindMedium = new TgcStaticSound();
             sound_WindMedium.loadSound(mediaDir + @"CEGA\Sound\viento_medio.wav", -2000);
+
+            sound_WindLeaves = new TgcStaticSound();
+            sound_WindLeaves.loadSound(examplesMediaDir + @"\Sound\viento en arbustos.wav", -2000);
 
             sound_music = new TgcStaticSound();
             sound_music.loadSound(mediaDir + @"CEGA\Sound\rabbia.wav", -2000);
@@ -364,9 +369,15 @@ namespace AlumnoEjemplos.CEGA.Scenes
             wind_wave_3 = WindCurve(x + 3.5f);
 
             if (FastMath.Abs(wind_wave_1) > 0.3f)
+            {
                 sound_WindLong.play();
+                sound_WindLeaves.play();
+            }
             else if (FastMath.Abs(wind_wave_1) > 0.13f)
+            {
                 sound_WindMedium.play();
+                sound_WindLeaves.play();
+            }
         }
 
         private float WindCurve(float x)

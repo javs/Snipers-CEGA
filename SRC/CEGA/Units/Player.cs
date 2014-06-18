@@ -158,7 +158,7 @@ namespace AlumnoEjemplos.CEGA.Units
             sound_Walk.loadSound(media + @"CEGA\Sound\pl_dirt1.wav", -2000);
 
             sound_Disparo = new TgcStaticSound();
-            sound_Disparo.loadSound(media + @"CEGA\Sound\disparo.wav", -1000);
+            sound_Disparo.loadSound(media + @"CEGA\Sound\disparo.wav", -1500);
 
             sound_DryFire = new TgcStaticSound();
             sound_DryFire.loadSound(media + @"CEGA\Sound\dryfire.wav", -1000);
