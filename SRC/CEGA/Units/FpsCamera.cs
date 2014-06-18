@@ -60,26 +60,6 @@ namespace AlumnoEjemplos.CEGA.Units
         Matrix vM;
 
         /// <summary>
-        /// Matriz de rotacion absoluta.
-        /// </summary>
-        Matrix rM;
-
-        /// <summary>
-        /// Retorna la matriz de rotacion absoluta.
-        /// </summary>
-        public Matrix RotationMatrix { get { return rM; } }
-
-        /// <summary>
-        /// Matriz de traslacion absoluta.
-        /// </summary>
-        Matrix tM;
-
-        /// <summary>
-        /// Retorna la matriz de rotacion absoluta.
-        /// </summary>
-        public Matrix TranslationMatrix { get { return tM; } }
-
-        /// <summary>
         /// true si la posicion cambio desde el ultimo render.
         /// </summary>
         bool positionChanged;
@@ -153,6 +133,16 @@ namespace AlumnoEjemplos.CEGA.Units
         /// </summary>
         public TgcStaticSound MovementSound { get; set; }
 
+        private TgcBoundingBox boundingBox;
+
+        /// <summary>
+        /// Retorna la AABB de la posicion actual.
+        /// </summary>
+        public TgcBoundingBox BoundingBox
+        {
+            get { return boundingBox; }
+        }
+
         /// <summary>
         /// Controla la captura del mouse.
         /// </summary>
@@ -181,9 +171,13 @@ namespace AlumnoEjemplos.CEGA.Units
             target  = new Vector3(1000.0f, 5.0f, 1001.0f);
             eye     = new Vector3(1000.0f, 5.0f, 1000.0f);
 
+            // \todo: configurable
+            float half_box = 4.0f;
+            boundingBox = new TgcBoundingBox(
+                new Vector3(eye.X - half_box, 0.0f, eye.Z - half_box),
+                new Vector3(eye.X + half_box, eye.Y, eye.Z + half_box));
+
             vM = Matrix.Identity;
-            rM = Matrix.Identity;
-            tM = Matrix.Identity;
 
             xAxis   = new Vector3();
             yAxis   = new Vector3();
@@ -249,26 +243,26 @@ namespace AlumnoEjemplos.CEGA.Units
             Vector3 movement = new Vector3(0.0f, 0.0f, 0.0f);
             
             if (input.keyDown(Key.W))
-            { 
-                movement += forward * (   MovementSpeed * ForwardFactor * elapsedTime);
+            {
+                movement += forward * (   MovementSpeed * elapsedTime * ForwardFactor);
                 moved = true;
             }
 
             if (input.keyDown(Key.A))
             {
-                movement += xAxis   * ( - MovementSpeed *                 elapsedTime);
+                movement += xAxis   * ( - MovementSpeed * elapsedTime);
                 moved = true;
             }
 
             if (input.keyDown(Key.S))
             {
-                movement += forward * ( - MovementSpeed *                 elapsedTime);
+                movement += forward * ( - MovementSpeed * elapsedTime);
                 moved = true;
             }
 
             if (input.keyDown(Key.D))
             {
-                movement += xAxis   * (   MovementSpeed *                 elapsedTime);
+                movement += xAxis   * (   MovementSpeed * elapsedTime);
                 moved = true;
             }
 
@@ -320,6 +314,7 @@ namespace AlumnoEjemplos.CEGA.Units
             // rotar la camara
             //
 
+            // \todo optimize ?
             Matrix deltaRM =
                 Matrix.RotationAxis(xAxis, rotX) *
                 Matrix.RotationAxis(up, rotY);
@@ -337,8 +332,6 @@ namespace AlumnoEjemplos.CEGA.Units
 
             // recalcular las dependencias
             //
-
-            rM *= deltaRM;
 
             forward = Vector3.Cross(xAxis, up);
             forward.Normalize();
@@ -365,10 +358,6 @@ namespace AlumnoEjemplos.CEGA.Units
             forward = Vector3.Cross(xAxis, up);
             forward.Normalize();
 
-            tM = Matrix.Translation(eye);
-
-            // \fixme actualizar rM
-
             rotationChanged = true;
             positionChanged = true;
         }
@@ -391,7 +380,7 @@ namespace AlumnoEjemplos.CEGA.Units
             eye    += delta;
             target += delta;
 
-            tM = Matrix.Translation(eye);
+            boundingBox.move(delta);
 
             positionChanged = true;
         }
