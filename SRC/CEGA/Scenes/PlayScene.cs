@@ -75,8 +75,8 @@ namespace AlumnoEjemplos.CEGA.Scenes
             pastoOriginal = scene.Meshes[0];
 
             //Crear varias instancias del modelo original, pero sin volver a cargar el modelo entero cada vez, hace 23*23 = 529 pinos
-            int rows = 23;
-            int cols = 23;
+            int rows = 22;
+            int cols = 22;
 
             Random RandomPlayScene = new Random(10);
 
@@ -101,7 +101,7 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
                     //Crear instancia de modelo 
                     //  Barriles
-                    if (i == 23)
+                    if (i == 21)
                     {
                         TgcMesh BarrilInstance = barrilOriginal.createMeshInstance(barrilOriginal.Name + i + j);
                         BarrilInstance.move(j * offset, 0, i * offset);
@@ -133,7 +133,7 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
                     //  Bancos de Pasto
 
-                    if ( j == 22)
+                    if ( j == 20)
                     generarBancoPasto(otrosObjetos, new Vector3(j * offset, 0, i * offset), RandomPlayScene);
 
                 }
