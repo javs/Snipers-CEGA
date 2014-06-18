@@ -67,17 +67,23 @@ VS_OUTPUT_DEFAULT vs_simplewindtree(VS_INPUT_DEFAULT Input)
 VS_OUTPUT_DEFAULT vs_simplewindgrass(VS_INPUT_DEFAULT Input)
 {
 	VS_OUTPUT_DEFAULT Output;
-
 	// Ajusta el viento a la parte superior del arbol
 	//
 	float y_adjust = Input.Position.y;
 
-	
-	if (y_adjust < 0.0f)
-		y_adjust = 0.0f;
+	//if (y_adjust < 0.0f)
+	//	y_adjust = 0.0f;
 
-	Input.Position.z += wind_wave * 0.1f * (y_adjust / 60.0f);
-	Input.Position.z += Input.Position.z * 0.1f * wind_wave;
+
+	// Animate the upper vertices and normals only
+
+	if (Input.Texcoord.y <= 0.1) {  // Or: if(v.TexCoords.y >= 0.9)
+
+		Input.Position.z += wind_wave * 4.1f * (y_adjust / 60.0f);
+		Input.Position.z += Input.Position.z * 0.1f * wind_wave;
+		// Insert the code for 7.4.2, 7.4.3, or 7.4.4
+
+	}
 
 	Output.Position = mul(Input.Position, matWorldViewProj);
 	Output.Texcoord = Input.Texcoord;

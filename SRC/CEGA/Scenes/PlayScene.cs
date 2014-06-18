@@ -58,7 +58,7 @@ namespace AlumnoEjemplos.CEGA.Scenes
             heightMap = new SimpleTerrain();
 
             heightMap.loadHeightmap(GuiController.Instance.AlumnoEjemplosMediaDir + "CEGA\\Heightmap\\" + "hmap4.jpg", 26, 0.4f, new Vector3(52, 0, 48));
-            heightMap.loadTexture(GuiController.Instance.AlumnoEjemplosMediaDir + "CEGA\\Textures\\" + "grass2.jpg");
+            heightMap.loadTexture(GuiController.Instance.AlumnoEjemplosMediaDir + "CEGA\\Textures\\" + "Pasto2.jpg");
 
 
             treeWindEffect = TgcShaders.loadEffect(
@@ -132,26 +132,11 @@ namespace AlumnoEjemplos.CEGA.Scenes
                     otrosObjetos.Add(instance);
 
                     //  Bancos de Pasto
-                    //for (int k = 1; k < 12; k++)
-                    //{
-                    //    TgcMesh pastoBanco = pastoOriginal.createMeshInstance(pastoOriginal.Name + i + j + k);
-                    //    pastoBanco.AlphaBlendEnable = true;
-                    //    pastoBanco.Scale = new Vector3(0.002f * scale, 0.002f * scale, 0.002f * scale);
-                    //    pastoBanco.move((j * offset) + bbPastoAnteriorX / 2, 0, i*offset + bbPastoAnteriorZ / 2);
-                    //    pastoBanco.UserProperties = new Dictionary<string, string>();
 
-                    //    bbPastoAnteriorZ = pastoBanco.BoundingBox.calculateSize().Z;
-                    //    bbPastoAnteriorX = pastoBanco.BoundingBox.calculateSize().X;
-
-                    //    otrosObjetos.Add(pastoBanco);
-
-                    //}
-                    if ( j > 21)
+                    if ( j == 22)
                     generarBancoPasto(otrosObjetos, new Vector3(j * offset, 0, i * offset), RandomPlayScene);
 
-
                 }
-
 
             }
 
