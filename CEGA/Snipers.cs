@@ -55,7 +55,7 @@ namespace AlumnoEjemplos.CEGA
 
         int stabilize = 3;
 
-        // hack: manejo de escenas
+        // hack: falta manejo de escenas
         VideoScene video;
 
         /// <summary>
@@ -63,9 +63,14 @@ namespace AlumnoEjemplos.CEGA
         /// </summary>
         public struct PostProcessEffects
         {
-            public bool LensDistortion;
+            public bool  LensDistortion;
             public float LensRadius;
         };
+
+        readonly string CHROMATIC_ABERRANCE_FACTOR_MOD = "Factor de Aberracion Chromatica";
+        readonly string BLUE_TINT_FACTOR_MOD = "Factor de Tinte Azul";
+        readonly string LENS_DISTORTION_K_MOD = "Coeficiente K de Distorsion de Lente";
+        readonly string LENS_DISTORTION_KCUBE_MOD = "Coeficiente K Cubico de Distorsion de Lente";
 
         public PostProcessEffects PostProcessing;
 
@@ -87,10 +92,6 @@ namespace AlumnoEjemplos.CEGA
             playScene = new PlayScene();
             player = new Player();
             enemigosAdmin = new EnemigosAdmin(playScene);
-
-            PostProcessing = new PostProcessEffects();
-            PostProcessing.LensDistortion = false;
-            PostProcessing.LensRadius = 0.3f;
 
             ColisionesAdmin.Instance.jugador = player;
             ColisionesAdmin.Instance.escenario = playScene;
@@ -142,6 +143,22 @@ namespace AlumnoEjemplos.CEGA
 
             postProcessEffect = TgcShaders.loadEffect(
                 GuiController.Instance.AlumnoEjemplosMediaDir + "CEGA\\Shaders\\PostProcess.fx");
+
+            PostProcessing = new PostProcessEffects();
+            PostProcessing.LensDistortion = false;
+            PostProcessing.LensRadius = 0.3f;
+
+            GuiController.Instance.Modifiers.addFloat(CHROMATIC_ABERRANCE_FACTOR_MOD,
+                0.0f, 6.0f, 1.0f);
+
+            GuiController.Instance.Modifiers.addFloat(BLUE_TINT_FACTOR_MOD,
+                0.0f, 6.0f, 1.0f);
+
+            GuiController.Instance.Modifiers.addFloat(LENS_DISTORTION_K_MOD,
+                -4.0f, 4.0f, 2.0f);
+
+            GuiController.Instance.Modifiers.addFloat(LENS_DISTORTION_KCUBE_MOD,
+                -4.0f, 4.0f, 2.0f);
         }
 
 
@@ -154,7 +171,7 @@ namespace AlumnoEjemplos.CEGA
         /// 
         public override void render(float elapsedTime)
         {
-            // El tiempo avanza durante la carga, estabilizarlo por tres frames.
+            // El tiempo avanza durante la carga, estabilizarlo por n frames.
             if (stabilize > 0)
             {
                 stabilize--;
@@ -169,7 +186,7 @@ namespace AlumnoEjemplos.CEGA
             Surface postDepthStencil = d3dDevice.DepthStencilSurface;
             Surface preTarget = preTargetTexture.GetSurfaceLevel(0);
 
-            // hack: scene management
+            // hack: falta manejo de escenas
             if (video.Playing)
             {
                 video.Update(elapsedTime);
@@ -183,8 +200,8 @@ namespace AlumnoEjemplos.CEGA
 
             d3dDevice.SetRenderTarget(0, preTarget);
             d3dDevice.DepthStencilSurface = preDepthStencil;
+
             SetupFog(d3dDevice, Color.Gray, -20.0f, 2600.0f);
-            //SetupFog(d3dDevice, Color.Gray, 0.5f, 0.8f);
 
             d3dDevice.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
             
@@ -239,11 +256,23 @@ namespace AlumnoEjemplos.CEGA
             d3dDevice.VertexFormat = CustomVertex.PositionTextured.Format;
             d3dDevice.SetStreamSource(0, vbPostProcessMesh, 0);
 
-            // \TODO JJ: multiples efectos
+            // \TODO JJ: multiples efectos en multiples render targets
             if (PostProcessing.LensDistortion)
             {
                 postProcessEffect.Technique = "LensDistortion";
                 postProcessEffect.SetValue("lens_radius", PostProcessing.LensRadius);
+
+                postProcessEffect.SetValue("chromatic_aberrance_factor",
+                    (float)GuiController.Instance.Modifiers.getValue(CHROMATIC_ABERRANCE_FACTOR_MOD));
+
+                postProcessEffect.SetValue("blue_tint_factor",
+                    (float)GuiController.Instance.Modifiers.getValue(BLUE_TINT_FACTOR_MOD));
+
+                postProcessEffect.SetValue("k",
+                    (float)GuiController.Instance.Modifiers.getValue(LENS_DISTORTION_K_MOD));
+
+                postProcessEffect.SetValue("kcube",
+                    (float)GuiController.Instance.Modifiers.getValue(LENS_DISTORTION_KCUBE_MOD));
 
                 Size screen = GuiController.Instance.Panel3d.Size;
 

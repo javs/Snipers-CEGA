@@ -15,6 +15,11 @@ struct VS_OUTPUT_DEFAULT
 };
 
 float lens_radius = 80.0f;
+float chromatic_aberrance_factor = 1.0f;
+float blue_tint_factor = 1.0f;
+float k = 2.0f;
+float kcube = 2.0f;
+
 float screen_w = 100.0f;
 float screen_h = 100.0f;
 
@@ -46,16 +51,6 @@ float4 ps_noeffect(float2 Texcoord : TEXCOORD0) : COLOR0
 	return tex2D(pre_render_sampler, Texcoord);
 }
 
-// Crea un efecto simple que solo permite ver un circulo en el centro
-float4 ps_lens_simple(float2 tex : TEXCOORD0) : COLOR0
-{
-	float4 color = tex2D(pre_render_sampler, tex);
-	float dist = distance(tex, float2(0.5, 0.5));
-	color *= smoothstep(0.68, 0.15, dist);
-
-	return color;
-}
-
 /*
 	Cubic Lens Distortion HLSL Shader
 
@@ -85,13 +80,6 @@ float4 ps_lens_distortion(float2 tex : TEXCOORD0) : COLOR0
 	}
 	else
 	{
-		// lens distortion coefficient
-		float k = 2.0f;
-
-		// cubic distortion value
-		float kcube = 2.0f;
-
-
 		float r2 = (tex.x - 0.5) * (tex.x - 0.5) + (tex.y - 0.5) * (tex.y - 0.5);
 		float f = 0;
 
@@ -110,12 +98,12 @@ float4 ps_lens_distortion(float2 tex : TEXCOORD0) : COLOR0
 
 		// jj: chromatic aberration. crea minimas variaciones en cada canal de color,
 		// que son distintas entre si.
-		float3 inputDistordR = tex2D(pre_render_sampler, float2(x, y) + 0.0004f);
-		float3 inputDistordG = tex2D(pre_render_sampler, float2(x, y) - 0.0004f);
-		float3 inputDistordB = tex2D(pre_render_sampler, float2(x, y - 0.005f));
+		float3 inputDistordR = tex2D(pre_render_sampler, float2(x, y) + (0.0004f * chromatic_aberrance_factor));
+		float3 inputDistordG = tex2D(pre_render_sampler, float2(x, y) - (0.0004f * chromatic_aberrance_factor));
+		float3 inputDistordB = tex2D(pre_render_sampler, float2(x, y - (0.005f * chromatic_aberrance_factor)));
 
 		// jj: tinte azul
-		finalColor = float4(inputDistordR.r, inputDistordG.g, inputDistordB.b + 0.02f, 1);
+		finalColor = float4(inputDistordR.r, inputDistordG.g, inputDistordB.b + (blue_tint_factor * 0.02f), 1);
 	}
 
 	return finalColor;

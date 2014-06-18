@@ -34,6 +34,7 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
         TgcStaticSound sound_WindLong;
         TgcStaticSound sound_WindMedium;
+        TgcStaticSound sound_WindLeaves;
         TgcStaticSound sound_music;
 
         float time = 0.0f;
@@ -48,6 +49,7 @@ namespace AlumnoEjemplos.CEGA.Scenes
         {
 
             string mediaDir = GuiController.Instance.AlumnoEjemplosMediaDir;
+            string examplesMediaDir = GuiController.Instance.ExamplesMediaDir;
 
             TgcTexture pisoTexture = TgcTexture.createTexture(GuiController.Instance.D3dDevice,
                  mediaDir + "CEGA\\Textures\\Grass.jpg");
@@ -107,18 +109,34 @@ namespace AlumnoEjemplos.CEGA.Scenes
                         BarrilInstance.move(j * offset, 0, i * offset);
                         BarrilInstance.AlphaBlendEnable = true;
                         BarrilInstance.Scale = new Vector3(0.09f, 0.09f, 0.09f);
+
+                        // gana algunos fps
+                        BarrilInstance.AutoTransformEnable = false;
+                        BarrilInstance.Transform =
+                            Matrix.Scaling(BarrilInstance.Scale) *
+                            Matrix.Translation(BarrilInstance.Position);
+
                         BarrilInstance.UserProperties = new Dictionary<string, string>();
                         BarrilInstance.UserProperties["colisionable"] = "";
 
                         otrosObjetos.Add(BarrilInstance);
                     }
-                    //  Pinos
-                    TgcMesh instance = pinoOriginal.createMeshInstance(pinoOriginal.Name + i + "_" + j);
-                    //Desplazarlo
-                    instance.move(i * offset, 0, j * offset);
-                    instance.AlphaBlendEnable = true;
 
+                    //  Pinos
+                    //
+
+                    TgcMesh instance = pinoOriginal.createMeshInstance(pinoOriginal.Name + i + "_" + j);
+                    
+                    instance.AlphaBlendEnable = true;
+                    instance.Position = new Vector3(i * offset, 0, j * offset);
                     instance.Scale = new Vector3(0.05f * (scale), 0.05f * (scale), 0.05f * (scale));
+
+                    // gana algunos fps
+                    instance.AutoTransformEnable = false;
+                    instance.Transform =
+                        Matrix.Scaling(instance.Scale) *
+                        Matrix.Translation(instance.Position);
+
                     instance.UserProperties = new Dictionary<string, string>();
                     instance.UserProperties["colisionable"] = "";
 
@@ -165,6 +183,9 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
             sound_WindMedium = new TgcStaticSound();
             sound_WindMedium.loadSound(mediaDir + @"CEGA\Sound\viento_medio.wav", -2000);
+
+            sound_WindLeaves = new TgcStaticSound();
+            sound_WindLeaves.loadSound(examplesMediaDir + @"\Sound\viento en arbustos.wav", -2000);
 
             sound_music = new TgcStaticSound();
             sound_music.loadSound(mediaDir + @"CEGA\Sound\rabbia.wav", -2000);
@@ -289,6 +310,13 @@ namespace AlumnoEjemplos.CEGA.Scenes
                     pastoBanco.UserProperties = new Dictionary<string, string>();
                     pastoBanco.Effect = treeWindEffect;
                     pastoBanco.Technique = "SimpleWindGrass";
+
+                    // gana algunos fps
+                    pastoBanco.AutoTransformEnable = false;
+                    pastoBanco.Transform =
+                        Matrix.Scaling(pastoBanco.Scale) *
+                        Matrix.Translation(pastoBanco.Position);
+
                     objs.Add(pastoBanco);
 
                 }
@@ -338,17 +366,23 @@ namespace AlumnoEjemplos.CEGA.Scenes
 
             wind_wave_1 = WindCurve(x);
             wind_wave_2 = WindCurve(x + 1.0f);
-            wind_wave_3 = WindCurve(x + 1.5f);
+            wind_wave_3 = WindCurve(x + 3.5f);
 
             if (FastMath.Abs(wind_wave_1) > 0.3f)
+            {
                 sound_WindLong.play();
+                sound_WindLeaves.play();
+            }
             else if (FastMath.Abs(wind_wave_1) > 0.13f)
+            {
                 sound_WindMedium.play();
+                sound_WindLeaves.play();
+            }
         }
 
         private float WindCurve(float x)
         {
-            // Curva de viento para arboles, basada en el Crysis.
+            // Curva de viento para arboles, basada en el libro de GPU Gems.
             return
                 FastMath.Cos(x * FastMath.PI) *
                 FastMath.Cos(x * 3.0f * FastMath.PI) *

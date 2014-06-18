@@ -9,6 +9,7 @@ using TgcViewer.Utils.TgcSceneLoader;
 using TgcViewer.Utils.Sound;
 using AlumnoEjemplos.CEGA.Interfaces;
 using AlumnoEjemplos.CEGA.Scenes;
+using Microsoft.DirectX.Direct3D;
 
 namespace AlumnoEjemplos.CEGA.Units
 {
@@ -157,7 +158,7 @@ namespace AlumnoEjemplos.CEGA.Units
             sound_Walk.loadSound(media + @"CEGA\Sound\pl_dirt1.wav", -2000);
 
             sound_Disparo = new TgcStaticSound();
-            sound_Disparo.loadSound(media + @"CEGA\Sound\disparo.wav", -1000);
+            sound_Disparo.loadSound(media + @"CEGA\Sound\disparo.wav", -1500);
 
             sound_DryFire = new TgcStaticSound();
             sound_DryFire.loadSound(media + @"CEGA\Sound\dryfire.wav", -1000);
@@ -342,23 +343,20 @@ namespace AlumnoEjemplos.CEGA.Units
         /// </summary>
         private void UpdateRifle()
         {
-            
             Matrix transformationMatrix = rifleBaseTransforms;
-            if (puedeDisparar == false)
+
+            if (!puedeDisparar)
                 //transformationMatrix = rifleBaseTransforms * Matrix.RotationX(this.RifleCurvaDisparo(elapsedROF));
-                transformationMatrix = rifleBaseTransforms * Matrix.Translation(rifle.Position.X, rifle.Position.Y, rifle.Position.Z - this.RifleCurvaDisparo(elapsedROF));
-            if ( moviendo == true )
-                transformationMatrix = rifleBaseTransforms * Matrix.Translation(rifle.Position.X, rifle.Position.Y, rifle.Position.Z - this.RifleCurvaMovimiento(elapsedMOVE));
+                transformationMatrix =
+                    rifleBaseTransforms *
+                    Matrix.Translation(rifle.Position.X, rifle.Position.Y, rifle.Position.Z - this.RifleCurvaDisparo(elapsedROF));
+            
+            if (moviendo)
+                transformationMatrix =
+                    rifleBaseTransforms *
+                    Matrix.Translation(rifle.Position.X, rifle.Position.Y, rifle.Position.Z - this.RifleCurvaMovimiento(elapsedMOVE));
 
-            rifle.Transform =
-                transformationMatrix *
-                camera.RotationMatrix *
-                camera.TranslationMatrix;
-
-
-            rifle.BoundingBox.transform(rifleBaseTransforms *
-                camera.RotationMatrix *
-                camera.TranslationMatrix);
+            rifle.Transform = transformationMatrix;
         }
 
         private void renderHUD()
@@ -383,11 +381,23 @@ namespace AlumnoEjemplos.CEGA.Units
 
         public void Render(Snipers scene)
         {
+            Device d3dDevice = GuiController.Instance.D3dDevice;
+
             if (this.vidas == 0)
                 scene.GameOver();
 
             if (!scope)
+            {
+                // dibuja el rifle enfrente del viewport, sacandole
+                // la matriz actual de vista
+                //
+
+                Matrix old_vm = d3dDevice.Transform.View;
+
+                d3dDevice.Transform.View = Matrix.Identity;
                 rifle.render();
+                d3dDevice.Transform.View = old_vm;
+            }
 
             scene.PostProcessing.LensDistortion = scope;
             scene.PostProcessing.LensRadius = scope_radius;
@@ -428,12 +438,12 @@ namespace AlumnoEjemplos.CEGA.Units
         }
 
         public TgcBoundingBox BoundingBoxJugador() {
-            return rifle.BoundingBox;
+            return camera.BoundingBox;
         }
 
         public TgcBoundingSphere BoundingSphereJugador()
         {
-            return (new TgcBoundingSphere(camera.getPosition(), (float)1));
+            return (new TgcBoundingSphere(camera.getPosition(), 1.0f));
         }
     }
 }
