@@ -87,19 +87,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="SRC\CEGA\Scenes\SimpleTerrain.cs" />
-    <Compile Include="SRC\CEGA\Scenes\VideoScene.cs" />
-    <Compile Include="SRC\CEGA\Units\ColisionesAdmin.cs" />
-    <Compile Include="SRC\CEGA\Units\Enemigo.cs" />
-    <Compile Include="SRC\CEGA\Units\EnemigosAdmin.cs" />
-    <Compile Include="SRC\CEGA\Interfaces\IRenderable.cs" />
-    <Compile Include="SRC\CEGA\Interfaces\IUpdatable.cs" />
-    <Compile Include="SRC\CEGA\Units\FpsCamera.cs" />
-    <Compile Include="SRC\CEGA\Units\GrillaRegular.cs" />
-    <Compile Include="SRC\CEGA\Units\GrillaRegularNode.cs" />
-    <Compile Include="SRC\CEGA\Units\Player.cs" />
-    <Compile Include="SRC\CEGA\Scenes\PlayScene.cs" />
-    <Compile Include="SRC\CEGA\Snipers.cs" />
+    <Compile Include="CEGA\Scenes\SimpleTerrain.cs" />
+    <Compile Include="CEGA\Scenes\VideoScene.cs" />
+    <Compile Include="CEGA\Units\ColisionesAdmin.cs" />
+    <Compile Include="CEGA\Units\Enemigo.cs" />
+    <Compile Include="CEGA\Units\EnemigosAdmin.cs" />
+    <Compile Include="CEGA\Interfaces\IRenderable.cs" />
+    <Compile Include="CEGA\Interfaces\IUpdatable.cs" />
+    <Compile Include="CEGA\Units\FpsCamera.cs" />
+    <Compile Include="CEGA\Units\GrillaRegular.cs" />
+    <Compile Include="CEGA\Units\GrillaRegularNode.cs" />
+    <Compile Include="CEGA\Units\Player.cs" />
+    <Compile Include="CEGA\Scenes\PlayScene.cs" />
+    <Compile Include="CEGA\Snipers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
