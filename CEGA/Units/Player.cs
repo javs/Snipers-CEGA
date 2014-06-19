@@ -372,7 +372,7 @@ namespace AlumnoEjemplos.CEGA.Units
             {
                 tammo.Text = "AMMO = INF"; 
             }
-            tammo.render();
+            //tammo.render();
 
             tpuntos.Text = "PUNTOS: " + (this.puntos * 100).ToString();
             tpuntos.render();

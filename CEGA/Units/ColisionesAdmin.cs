@@ -32,7 +32,7 @@ namespace AlumnoEjemplos.CEGA.Units
 
         public static ColisionesAdmin Instance
         {
-            get 
+            get
             {
                 if (instance == null)
                     instance = new ColisionesAdmin();
@@ -43,7 +43,8 @@ namespace AlumnoEjemplos.CEGA.Units
         public ColisionesAdmin()
         {
             sound_Explosion = new TgcStaticSound();
-            sound_Explosion.loadSound(GuiController.Instance.AlumnoEjemplosMediaDir + @"CEGA\Sound\explosion.wav", -1000);
+            sound_Explosion.loadSound(GuiController.Instance.AlumnoEjemplosMediaDir + @"CEGA\Sound\explosion.wav", -500);
+
         }
 
         public bool ColisionDisparo(TgcRay disparo)
@@ -53,10 +54,10 @@ namespace AlumnoEjemplos.CEGA.Units
 
             foreach (Enemigo enemigo in enemigos.ListaDeEnemigosOrdenadaPorDistancia())
             {
-                
+
                 if (TgcCollisionUtils.intersectRayAABB(disparo, enemigo.BoundingBoxEnemigo(), out interseccion))
                 {
-                    enemigo.Herir(damage_Body);
+                    enemigo.Herir(damage_Body, interseccion);
 
                     if (enemigo.Murio())
                     {
@@ -68,9 +69,9 @@ namespace AlumnoEjemplos.CEGA.Units
                     return true;
                 }
 
-                if (TgcCollisionUtils.intersectRaySphere(disparo,enemigo.BoundingBoxCabeza(), out distancia, out interseccion))
+                if (TgcCollisionUtils.intersectRaySphere(disparo, enemigo.BoundingBoxCabeza(), out distancia, out interseccion))
                 {
-                    enemigo.Herir(damage_Head);
+                    enemigo.Herir(damage_Head, interseccion);
 
                     if (enemigo.Murio())
                     {
@@ -104,7 +105,7 @@ namespace AlumnoEjemplos.CEGA.Units
                         //Me fijo si cumple con el radio (si tenemos el objeto barril, cada barril puede tener su radio)
                         if (d <= 300) //Radio hardcodeado
                         {
-                            enemigo.Herir(300 / (0.05F * d));
+                            enemigo.Herir(300 / (0.05F * d), interseccion);
 
                             if (enemigo.Murio())
                             {
@@ -125,9 +126,9 @@ namespace AlumnoEjemplos.CEGA.Units
             return false;
         }
 
-        public bool ColisionConObjetos() 
+        public bool ColisionConObjetos()
         {
-      
+
             foreach (TgcMesh obstaculo in escenario.ObjetosConColisionCerca(jugador.BoundingBoxJugador()))
             {
                 if (TgcCollisionUtils.testSphereAABB(jugador.BoundingSphereJugador(), obstaculo.BoundingBox))
@@ -154,7 +155,7 @@ namespace AlumnoEjemplos.CEGA.Units
                     enemigos.Reset();
                     return true;
                 }
-                    
+
             }
             return false;
         }
@@ -184,6 +185,6 @@ namespace AlumnoEjemplos.CEGA.Units
             enemigoColision = null;
             return false;
         }
-		
+
     }
 }

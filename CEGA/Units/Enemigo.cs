@@ -10,6 +10,7 @@ using TgcViewer.Utils.TgcGeometry;
 using TgcViewer.Utils.TgcSceneLoader;
 using TgcViewer.Utils.TgcSkeletalAnimation;
 using AlumnoEjemplos.CEGA.Interfaces;
+using TgcViewer.Utils.Particles;
 
 namespace AlumnoEjemplos.CEGA.Units
 {
@@ -28,6 +29,7 @@ namespace AlumnoEjemplos.CEGA.Units
         Vector3 direccionColisionObjeto = new Vector3(0, 0, 0);
         Vector3 direccionColisionEnemigo = new Vector3(0, 0, 0);
         Vector3 direccionRandom = new Vector3(0, 0, 0);
+        ParticleEmitter emisorDeParticulas;
 
         bool muriendo;
 
@@ -49,14 +51,14 @@ namespace AlumnoEjemplos.CEGA.Units
         }
 
         public bool colisionado { get; set; }
-        
+
         public uint id { get; set; }
 
         public Enemigo(Vector3 posicion)
         {
             //Cargar enemigo
             TgcSkeletalLoader skeletalLoader = new TgcSkeletalLoader();
-            
+
 
             meshEnemigos.Add("BasicHuman-TgcSkeletalMesh.xml");
             meshEnemigos.Add("CombineSoldier-TgcSkeletalMesh.xml");
@@ -67,7 +69,7 @@ namespace AlumnoEjemplos.CEGA.Units
             meshEnemigos.Add("WomanJeans-TgcSkeletalMesh.xml");
 
             enemigo = skeletalLoader.loadMeshAndAnimationsFromFile(
-                GuiController.Instance.ExamplesMediaDir + "SkeletalAnimations\\BasicHuman\\" + meshEnemigos[randomEnemigo.Next(0,6)],
+                GuiController.Instance.ExamplesMediaDir + "SkeletalAnimations\\BasicHuman\\" + meshEnemigos[randomEnemigo.Next(0, 6)],
                 new string[] {
                     GuiController.Instance.ExamplesMediaDir + "SkeletalAnimations\\BasicHuman\\Animations\\" + "Walk-TgcSkeletalAnim.xml",
                     GuiController.Instance.ExamplesMediaDir + "SkeletalAnimations\\BasicHuman\\Animations\\" + "StandBy-TgcSkeletalAnim.xml",
@@ -80,17 +82,21 @@ namespace AlumnoEjemplos.CEGA.Units
             enemigo.Position = posicion;
             enemigo.Scale = new Vector3(0.12f, 0.12f, 0.12f);
             this.colisionado = false;
-            
+
             //Inicializo HP
             hp = 100;
 
             //Creo el BB para la cabeza
-            cabeza = new TgcBoundingSphere(new Vector3(enemigo.Position.X, enemigo.Position.Y + 5.2F,enemigo.Position.Z), 0.5F); //Debe haber alguna forma de sacar esta info del hueso directamente
+            cabeza = new TgcBoundingSphere(new Vector3(enemigo.Position.X, enemigo.Position.Y + 5.2F, enemigo.Position.Z), 0.5F); //Debe haber alguna forma de sacar esta info del hueso directamente
             cabeza.setRenderColor(System.Drawing.Color.Red);
 
             //Modifico el BB del cuerpo
             enemigo.AutoUpdateBoundingBox = false;
             enemigo.BoundingBox.scaleTranslate(enemigo.Position, new Vector3(0.07f, 0.095f, 0.07f));
+
+            //Inicializo el emisor
+            emisorDeParticulas = new ParticleEmitter(GuiController.Instance.AlumnoEjemplosMediaDir + "CEGA\\Textures\\blood.jpg", 500);
+            emisorDeParticulas.Playing = false;
 
         }
 
@@ -121,7 +127,7 @@ namespace AlumnoEjemplos.CEGA.Units
             {
                 direccionColisionObjeto = vectorNulo;
 
-                if ( this.colisionado == true )
+                if (this.colisionado == true)
                 {
                     if (!ColisionesAdmin.Instance.ColisionEnemigoConEnemigos(this, out otroEnemigo))
                     {
@@ -131,7 +137,7 @@ namespace AlumnoEjemplos.CEGA.Units
                     else if (direccionColisionEnemigo == vectorNulo)
                     {
                         angulo = (180 * (float)Math.Atan2(direccionMovimiento.Z, direccionMovimiento.X)) / (float)Math.PI;// +45;
-                        int anguloGiro = randomEnemigo.Next(45,90);
+                        int anguloGiro = randomEnemigo.Next(45, 90);
                         if (randomEnemigo.Next(0, 2) == 1)
                             anguloGiro *= -1;
                         angulo += anguloGiro;
@@ -147,7 +153,7 @@ namespace AlumnoEjemplos.CEGA.Units
                     {
                         angulo = (180 * (float)FastMath.Atan2(direccionMovimiento.Z, direccionMovimiento.X)) / (float)Math.PI;// +45;
                         int anguloGiro = 30;
-                        if  (randomEnemigo.Next(0,2) == 1)
+                        if (randomEnemigo.Next(0, 2) == 1)
                             anguloGiro = 90;
                         angulo += anguloGiro;
                         direccionRandom = Rotar(angulo);
@@ -174,6 +180,8 @@ namespace AlumnoEjemplos.CEGA.Units
             enemigo.move(direccionMovimiento * velocidadEnemigo * elapsedTime);
             cabeza.moveCenter(direccionMovimiento * velocidadEnemigo * elapsedTime);
             enemigo.BoundingBox.move(direccionMovimiento * velocidadEnemigo * elapsedTime);
+
+            emisorDeParticulas.Position = new Vector3(enemigo.Position.X, emisorDeParticulas.Position.Y, enemigo.Position.Z);
         }
 
         private const float LADO_CUBO = 1.0f;
@@ -228,6 +236,9 @@ namespace AlumnoEjemplos.CEGA.Units
         {
             enemigo.render();
 
+            if (hp < 100)
+                emisorDeParticulas.render();
+
             if ((bool)GuiController.Instance.Modifiers.getValue("showBB"))
             {
                 enemigo.BoundingBox.render();
@@ -239,9 +250,19 @@ namespace AlumnoEjemplos.CEGA.Units
         {
         }
 
-        public void Herir(float hpARestar)
+        public void Herir(float hpARestar, Vector3 posicionDelImpacto)
         {
             hp -= hpARestar;
+
+            emisorDeParticulas.Position = posicionDelImpacto;
+            emisorDeParticulas.Playing = true;
+            emisorDeParticulas.MaxSizeParticle = 25;
+            emisorDeParticulas.MinSizeParticle = 5;
+            emisorDeParticulas.CreationFrecuency = 0.05F;
+            emisorDeParticulas.Dispersion = 10;
+            emisorDeParticulas.Speed = new Vector3(2, -2, 2);
+
+
         }
 
         public bool Murio()

@@ -97,6 +97,7 @@
     <Compile Include="CEGA\Units\FpsCamera.cs" />
     <Compile Include="CEGA\Units\GrillaRegular.cs" />
     <Compile Include="CEGA\Units\GrillaRegularNode.cs" />
+    <Compile Include="CEGA\Units\ParticleEmitter.cs" />
     <Compile Include="CEGA\Units\Player.cs" />
     <Compile Include="CEGA\Scenes\PlayScene.cs" />
     <Compile Include="CEGA\Snipers.cs" />
